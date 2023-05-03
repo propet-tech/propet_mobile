@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:propet_mobile/core/providers.dart';
 import 'package:propet_mobile/core/routes.dart';
 
 void main() {
+  setupProviders();
   runApp(const ProPetApp());
 }
 

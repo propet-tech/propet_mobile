@@ -25,21 +25,21 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
         Icons.home,
       ),
       label: "Home",
-      initialLocation: "/a",
+      initialLocation: "/home",
     ),
     const ScaffoldWithNavBarTabItem(
       icon: Icon(
         Icons.pets,
       ),
       label: "Pets",
-      initialLocation: "/b",
+      initialLocation: "/orders",
     ),
     const ScaffoldWithNavBarTabItem(
       icon: Icon(
         Icons.shopping_bag,
       ),
       label: "Pedidos",
-      initialLocation: "/a",
+      initialLocation: "/login",
     ),
   ];
 

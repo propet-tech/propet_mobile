@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   stomp_dart_client: ^0.4.4
   go_router: ^7.0.0
+  get_it: ^7.3.0
+  oauth2: ^2.0.1
 
 dev_dependencies:
   flutter_test:
