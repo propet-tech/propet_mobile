@@ -1,9 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:propet_mobile/pages/home_page.dart';
 import 'package:propet_mobile/pages/pedido_page.dart';
 
 void main() {
   runApp(const MyApp());
 }
+
+final routes = GoRouter(
+  initialLocation: "/a",
+  routes: [
+    ShellRoute(
+      builder: (context, state, child) {
+        return ScaffoldNavBar(child: child);
+      },
+      routes: [
+        GoRoute(
+          path: "/a",
+          pageBuilder: (context, state) {
+            return NoTransitionPage(child: Pedidos());
+          },
+        ),
+        GoRoute(
+          path: "/b",
+          pageBuilder: (context, state) {
+            return NoTransitionPage(child: HomePage());
+          },
+        )
+      ],
+    )
+  ],
+);
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -11,7 +38,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'ProPet',
       theme: ThemeData(
         // This is the theme of your application.
@@ -25,75 +52,93 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      routerDelegate: routes.routerDelegate,
+      routeInformationParser: routes.routeInformationParser,
+      routeInformationProvider: routes.routeInformationProvider,
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class ScaffoldWithNavBarTabItem extends BottomNavigationBarItem {
+  const ScaffoldWithNavBarTabItem(
+      {required this.initialLocation, required Widget icon, String? label})
+      : super(icon: icon, label: label);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  /// The initial location/path
+  final String initialLocation;
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class ScaffoldNavBar extends StatefulWidget {
+  final Widget child;
+
+  const ScaffoldNavBar({super.key, required this.child});
+
+  @override
+  State<ScaffoldNavBar> createState() => _ScaffoldNavBarState();
+}
+
+class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
+  final tabs = [
+    const ScaffoldWithNavBarTabItem(
+        icon: Icon(Icons.home), label: "Home", initialLocation: "/a"),
+    const ScaffoldWithNavBarTabItem(
+        icon: Icon(Icons.pets), label: "Pets", initialLocation: "/b"),
+    const ScaffoldWithNavBarTabItem(
+        icon: Icon(Icons.shopping_bag),
+        label: "Pedidos",
+        initialLocation: "/a"),
+  ];
+
+  int get currentIndex => locationToIndex(GoRouter.of(context).location);
+
+  int locationToIndex(String location) {
+    final index =
+        tabs.indexWhere((t) => location.startsWith(t.initialLocation));
+    return index < 0 ? 0 : index;
+  }
+
+  void onTap(int index) {
+    if (index != currentIndex) {
+      // go to the initial location of the selected tab (by index)
+      context.go(tabs[index].initialLocation);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: const [
-            CircleAvatar(
+        leading: GestureDetector(
+          child: Container(
+            margin: EdgeInsets.all(6),
+            child: const CircleAvatar(
               backgroundImage: AssetImage("assets/images/kasane-teto.gif"),
             ),
-            Expanded(
-              child: Center(
-                child: Text("Meus Pedidos"),
-              ),
-            ),
-          ],
+          ),
+          onTap: () {},
+        ),
+        title: const Center(
+          child: Text("Meus Pedidos"),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         unselectedItemColor: Theme.of(context).colorScheme.background,
         selectedItemColor: Theme.of(context).colorScheme.background,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home"
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.pets),
-            label: "Pets"
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag),
-            label: "Pedidos"
-          ),
-        ],
+        items: tabs,
+        onTap: (value) {
+          onTap(value);
+        },
       ),
-      body: LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+      body: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
         return Container(
           padding: const EdgeInsets.all(10),
           height: constraints.maxHeight,
           width: constraints.maxWidth,
-          child: const Pedidos(),
+          child: widget.child,
         );
       }),
     );
   }
 }
-
