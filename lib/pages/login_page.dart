@@ -16,21 +16,62 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Login biloso"),
-      ),
-      body: Column(
+      body: Stack(
         children: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                // getIt<AuthService>().authenticate();
-                GoRouter.of(context).go("/home");
-              });
-            },
-            child: Text("Login"),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.secondary,
+                  Theme.of(context).colorScheme.tertiary
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
           ),
-          Text(bacate)
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "Bem vindo ao Propet!",
+                  style: TextStyle(fontSize: 24),
+                ),
+                SizedBox(height: 25),
+                TextFormField(
+                  decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(),
+                      hintText: "E-mail",
+                      prefixIcon: Icon(
+                        Icons.email,
+                        color: Colors.white,
+                      ),
+                      fillColor: Colors.grey,
+                      filled: true),
+                ),
+                SizedBox(height: 10),
+                TextFormField(
+                  decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(),
+                      hintText: "Senha",
+                      prefixIcon: Icon(
+                        Icons.lock,
+                        color: Colors.white,
+                      )),
+                ),
+                SizedBox(height: 10),
+                ElevatedButton(onPressed: () {
+                  context.go("/home");
+                }, child: Text("Login"))
+              ],
+            ),
+          )
         ],
       ),
     );
