@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:propet_mobile/core/providers.dart';
 import 'package:propet_mobile/services/auth_service.dart';
 
@@ -23,7 +24,8 @@ class _LoginPageState extends State<LoginPage> {
           TextButton(
             onPressed: () {
               setState(() {
-                getIt<AuthService>().authenticate().then((value) => bacate = value);
+                // getIt<AuthService>().authenticate();
+                GoRouter.of(context).go("/home");
               });
             },
             child: Text("Login"),

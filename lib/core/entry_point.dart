@@ -3,9 +3,13 @@ import 'package:go_router/go_router.dart';
 
 class ScaffoldWithNavBarTabItem extends BottomNavigationBarItem {
   final String initialLocation;
+  final String title;
 
   const ScaffoldWithNavBarTabItem(
-      {required this.initialLocation, required Widget icon, String? label})
+      {required this.initialLocation,
+      required Widget icon,
+      String? label,
+      required this.title})
       : super(icon: icon, label: label);
 }
 
@@ -25,21 +29,24 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
         Icons.home,
       ),
       label: "Home",
+      title: "Home",
       initialLocation: "/home",
     ),
     const ScaffoldWithNavBarTabItem(
       icon: Icon(
         Icons.pets,
       ),
+      title: "Meus Pets",
       label: "Pets",
-      initialLocation: "/orders",
+      initialLocation: "/pets",
     ),
     const ScaffoldWithNavBarTabItem(
       icon: Icon(
         Icons.shopping_bag,
       ),
+      title: "Meus Pedidos",
       label: "Pedidos",
-      initialLocation: "/login",
+      initialLocation: "/orders",
     ),
   ];
 
@@ -53,7 +60,6 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
 
   void onTap(int index) {
     if (index != currentIndex) {
-      // go to the initial location of the selected tab (by index)
       context.go(tabs[index].initialLocation);
     }
   }
@@ -64,18 +70,18 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
       appBar: AppBar(
         leading: GestureDetector(
           child: Container(
-            margin: EdgeInsets.all(6),
+            margin: const EdgeInsets.all(6),
             child: const CircleAvatar(
               backgroundImage: AssetImage("assets/images/kasane-teto.gif"),
             ),
           ),
           onTap: () {},
         ),
-        title: const Center(
-          child: Text("Meus Pedidos"),
-        ),
+        centerTitle: true,
+        title: Text(tabs[currentIndex].title),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentIndex,
         backgroundColor: Theme.of(context).colorScheme.primary,
         unselectedItemColor: Theme.of(context).colorScheme.background,
         selectedItemColor: Theme.of(context).colorScheme.background,
@@ -85,14 +91,14 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
         },
       ),
       body: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-        return Container(
-          padding: const EdgeInsets.all(10),
-          height: constraints.maxHeight,
-          width: constraints.maxWidth,
-          child: widget.child,
-        );
-      }),
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return Container(
+            height: constraints.maxHeight,
+            width: constraints.maxWidth,
+            child: widget.child,
+          );
+        },
+      ),
     );
   }
 }

@@ -1,20 +1,25 @@
-import 'package:oauth2/oauth2.dart' as oauth2;
+import 'package:openid_client/openid_client_io.dart';
 
 class AuthService {
-  Future<String> authenticate() async {
-    final authorizationEndpoint =
-        Uri.parse('http://192.168.1.124:8080/realms/propet/protocol/openid-connect/token');
 
-    final username = 'nero';
+
+
+  void authenticate() async {
+    var uri = Uri.http(
+      "192.168.1.124:8080",
+      "realms/propet",
+    );
+
+    var issuer = await Issuer.discover(uri);
+    var client = Client(issuer, "propet-web");
+
+    final username = 'nero@neropolis.breno.com';
     final password = '123';
 
-    final identifier = 'propet-web';
-    final secret = 'my client secret';
+    var flow = Flow.password(client);
 
-    var client = await oauth2.resourceOwnerPasswordGrant(
-        authorizationEndpoint, username, password,
-        identifier: identifier, secret: secret);
+    flow.loginWithPassword(username: username, password: password).then((value) => print(value.getUserInfo()));
 
-    return client.credentials.toJson();
+    
   }
 }

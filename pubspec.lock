@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.1"
+  asn1lib:
+    dependency: transitive
+    description:
+      name: asn1lib
+      sha256: ab96a1cb3beeccf8145c52e449233fe68364c9641623acd3adad66f8184f1039
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.0"
   async:
     dependency: transitive
     description:
@@ -161,14 +169,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
-  cupertino_icons:
-    dependency: "direct main"
+  crypto_keys:
+    dependency: transitive
     description:
-      name: cupertino_icons
-      sha256: e35129dc44c9118cee2a5603506d823bab99c68393879edb440e0090d07586be
+      name: crypto_keys
+      sha256: acc19abf34623d990a0e8aec69463d74a824c31f137128f42e2810befc509ad0
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.5"
+    version: "0.3.0+1"
   dart_style:
     dependency: transitive
     description:
@@ -312,6 +320,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  jose:
+    dependency: transitive
+    description:
+      name: jose
+      sha256: "06d28181b3ca26ffb83bf943f62f29d6b1b55793c852a389d3a29e6a5f54d325"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.3"
   js:
     dependency: transitive
     description:
@@ -384,14 +400,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
-  oauth2:
+  openid_client:
     dependency: "direct main"
     description:
-      name: oauth2
-      sha256: "1e8376c222651904caf7785fd2fa01b1e2be608c94bec842a94e116deca88f13"
+      name: openid_client
+      sha256: "514c0ba645b81029c28999831a70cb055dda1a3bc60be759a04d2556f60ec960"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "0.4.7"
   package_config:
     dependency: transitive
     description:
@@ -408,6 +424,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.8.2"
+  pointycastle:
+    dependency: transitive
+    description:
+      name: pointycastle
+      sha256: "7c1e5f0d23c9016c5bbd8b1473d0d3fb3fc851b876046039509e18e0c7485f2c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.7.3"
   pool:
     dependency: transitive
     description:
@@ -432,6 +456,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.2"
+  quiver:
+    dependency: transitive
+    description:
+      name: quiver
+      sha256: b1c1ac5ce6688d77f65f3375a9abb9319b3cb32486bdc7a1e0fdf004d7ba4e47
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.1"
   shelf:
     dependency: transitive
     description:
@@ -581,6 +613,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.0"
+  x509:
+    dependency: transitive
+    description:
+      name: x509
+      sha256: "6db77b0baecf54584f886607247e9dedd9fd63f1e2d0ee0a00b5bb353fd7885f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.3"
   yaml:
     dependency: transitive
     description:

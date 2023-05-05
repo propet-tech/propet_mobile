@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class Pedidos extends StatelessWidget {
   const Pedidos({super.key});
@@ -50,12 +51,14 @@ class CampoPedido extends StatelessWidget {
                     children: [
                       Text("Total: R\$ 100.00"),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          context.push("/orders/12");
+                        },
                         child: Text(
                           "Acompanhar",
                           style: TextStyle(color: Colors.red),
                         ),
-                      )
+                      ),
                     ],
                   )
                 ],
