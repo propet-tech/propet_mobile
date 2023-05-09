@@ -51,9 +51,9 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-
+        minSdkVersion 18
         manifestPlaceholders += [
-                'appAuthRedirectScheme': 'br.com.senai.propet'
+                'appAuthRedirectScheme': 'com.duendesoftware.demo'
         ]
     }
 

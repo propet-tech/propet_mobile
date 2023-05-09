@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.propet_mobile">
    <application
-        android:label="propet_mobile"
+        android:usesCleartextTraffic="true"
+        android:label="ProPet"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
