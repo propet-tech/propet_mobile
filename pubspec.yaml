@@ -36,7 +36,12 @@ dependencies:
   dio: ^5.1.1
   json_annotation: ^4.8.1
   infinite_scroll_pagination: ^3.2.0
-  openid_client: ^0.4.7
+  flutter_secure_storage: ^8.0.0
+  flutter_native_splash: ^2.2.19
+  url_launcher: ^6.1.10
+  flutter_appauth: ^5.0.0
+  injectable: ^2.1.1
+  provider: ^6.0.5
 
 dev_dependencies:
   flutter_test:
@@ -50,6 +55,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
   build_runner: ^2.3.3
+  injectable_generator: ^2.1.5
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -66,6 +72,7 @@ flutter:
   assets:
     - assets/images/kasane-teto.gif
     - assets/images/dog.jpg
+    - assets/images/logo-light.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -92,3 +99,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+flutter_native_splash:
+  color: "#01579B"
+  color_dark: "#01579B"  
+  image: assets/images/logo-light.png
+  image_dark: assets/images/logo-light.png
+  fullscreen: true
