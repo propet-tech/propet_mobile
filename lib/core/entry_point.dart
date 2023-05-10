@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:propet_mobile/core/auth/auth_service.dart';
+import 'package:propet_mobile/core/dependencies.dart';
+import 'package:propet_mobile/models/userinfo.dart';
+import 'package:provider/provider.dart';
 
 class ScaffoldWithNavBarTabItem extends BottomNavigationBarItem {
   final String initialLocation;
@@ -66,16 +70,71 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
 
   @override
   Widget build(BuildContext context) {
+    final userinfo = context.read<UserInfo>();
+
+    final picture = NetworkImage(userinfo.picture!);
+
     return Scaffold(
-      appBar: AppBar(
-        leading: GestureDetector(
-          child: Container(
-            margin: const EdgeInsets.all(6),
-            child: const CircleAvatar(
-              backgroundImage: AssetImage("assets/images/kasane-teto.gif"),
+      drawer: Drawer(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Container(
+                  child: CircleAvatar(
+                    radius: 60,
+                    backgroundImage: picture,
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(userinfo.name ?? "Sem Nome"),
+                SizedBox(
+                  height: 10,
+                ),
+                ElevatedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                  ),
+                  icon: Icon(Icons.logout),
+                  onPressed: () {
+                    getIt<AuthService>().logout();
+                  },
+                  label: Text("Sair"),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                ElevatedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                  ),
+                  icon: Icon(Icons.settings),
+                  onPressed: () {},
+                  label: Text("Configurações"),
+                )
+              ],
             ),
           ),
-          onTap: () {},
+        ),
+      ),
+      appBar: AppBar(
+        leading: Builder(
+          builder: (context) {
+            return GestureDetector(
+              child: Container(
+                margin: const EdgeInsets.all(6),
+                child: CircleAvatar(
+                  backgroundImage: picture,
+                ),
+              ),
+              onTap: () {
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          },
         ),
         centerTitle: true,
         title: Text(tabs[currentIndex].title),

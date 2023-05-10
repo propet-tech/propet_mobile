@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:propet_mobile/core/providers.dart';
 import 'package:propet_mobile/core/routes.dart';
+import 'package:propet_mobile/core/dependencies.dart';
+import 'package:propet_mobile/pages/loading_page.dart';
 
-void main() {
-  setupProviders();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(MaterialApp(
+    home: LoadingPage(),
+  ));
+  // init dependencies
+  await Future.delayed(Duration(seconds: 10));
+  await configureDependencies();
   runApp(const ProPetApp());
 }
 
@@ -20,4 +27,3 @@ class ProPetApp extends StatelessWidget {
     );
   }
 }
-
