@@ -1,14 +1,17 @@
 import 'package:dio/dio.dart';
-import 'package:propet_mobile/core/providers.dart';
+import 'package:injectable/injectable.dart';
 import 'package:propet_mobile/models/page.dart';
 import 'package:propet_mobile/models/pet.dart';
 
+@Injectable()
 class PetService {
-  final http = getIt<Dio>();
+  final Dio http;
+
+  PetService(this.http);
 
   Future<PageContent<Pet>> getAllPets([int? pageIndex, int? pageSize]) {
     return http.get(
-      "http://192.168.1.124:8088/api/pet",
+      "/pet",
       queryParameters: {"page": pageIndex, "size": pageSize},
     ).then((value) {
       return PageContent.fromJson(value.data, (json) => Pet.fromJson(json));
