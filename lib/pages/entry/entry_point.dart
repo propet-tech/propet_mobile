@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:propet_mobile/core/auth/auth_service.dart';
-import 'package:propet_mobile/core/dependencies.dart';
+import 'package:propet_mobile/core/components/profile_picture.dart';
 import 'package:propet_mobile/models/userinfo.dart';
+import 'package:propet_mobile/pages/entry/drawer.dart';
 import 'package:provider/provider.dart';
 
 class ScaffoldWithNavBarTabItem extends BottomNavigationBarItem {
@@ -71,63 +71,29 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
   @override
   Widget build(BuildContext context) {
     final userinfo = context.read<UserInfo>();
-
-    final picture = NetworkImage(userinfo.picture!);
+    // final picture = NetworkImage(userinfo.picture!);
 
     return Scaffold(
-      drawer: Drawer(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Container(
-                  child: CircleAvatar(
-                    radius: 60,
-                    backgroundImage: picture,
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(userinfo.name ?? "Sem Nome"),
-                SizedBox(
-                  height: 10,
-                ),
-                ElevatedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                  ),
-                  icon: Icon(Icons.logout),
-                  onPressed: () {
-                    getIt<AuthService>().logout();
-                  },
-                  label: Text("Sair"),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                ElevatedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                  ),
-                  icon: Icon(Icons.settings),
-                  onPressed: () {},
-                  label: Text("Configurações"),
-                )
-              ],
+      drawer: const AppDrawer(),
+      appBar: AppBar(
+        scrolledUnderElevation: 0,
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 18),
+            alignment: Alignment.center,
+            child: const Badge(
+              label: Text("20"),
+              child: Icon(Icons.shopping_cart),
             ),
           ),
-        ),
-      ),
-      appBar: AppBar(
+        ],
         leading: Builder(
           builder: (context) {
             return GestureDetector(
               child: Container(
                 margin: const EdgeInsets.all(6),
-                child: CircleAvatar(
-                  backgroundImage: picture,
+                child: ProfilePicture(
+                  userInfo: userinfo,
                 ),
               ),
               onTap: () {
@@ -141,9 +107,6 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Theme.of(context).colorScheme.background,
-        selectedItemColor: Theme.of(context).colorScheme.background,
         items: tabs,
         onTap: (value) {
           onTap(value);
@@ -151,7 +114,7 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
       ),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          return Container(
+          return SizedBox(
             height: constraints.maxHeight,
             width: constraints.maxWidth,
             child: widget.child,
