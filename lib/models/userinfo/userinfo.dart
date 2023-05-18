@@ -1,12 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'userinfo.g.dart';
 
 @JsonSerializable()
-class UserInfo with ChangeNotifier {
+class UserInfo {
   String? picture; 
-  String? name;
+  String name;
 
   UserInfo({required this.picture, required this.name});
 
