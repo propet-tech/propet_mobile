@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:propet_mobile/core/app_state.dart';
 import 'package:propet_mobile/core/components/profile_picture.dart';
-import 'package:propet_mobile/models/userinfo.dart';
 import 'package:propet_mobile/pages/entry/drawer.dart';
 import 'package:provider/provider.dart';
 
@@ -29,25 +29,19 @@ class ScaffoldNavBar extends StatefulWidget {
 class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
   final tabs = [
     const ScaffoldWithNavBarTabItem(
-      icon: Icon(
-        Icons.home,
-      ),
+      icon: Icon(Icons.home),
       label: "Home",
       title: "Home",
       initialLocation: "/home",
     ),
     const ScaffoldWithNavBarTabItem(
-      icon: Icon(
-        Icons.pets,
-      ),
+      icon: Icon(Icons.pets),
       title: "Meus Pets",
       label: "Pets",
       initialLocation: "/pets",
     ),
     const ScaffoldWithNavBarTabItem(
-      icon: Icon(
-        Icons.shopping_bag,
-      ),
+      icon: Icon(Icons.shopping_bag),
       title: "Meus Pedidos",
       label: "Pedidos",
       initialLocation: "/orders",
@@ -70,9 +64,7 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
 
   @override
   Widget build(BuildContext context) {
-    final userinfo = context.read<UserInfo>();
-    // final picture = NetworkImage(userinfo.picture!);
-
+    final userinfo = context.read<AppState>().userinfo;
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
@@ -93,7 +85,7 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
               child: Container(
                 margin: const EdgeInsets.all(6),
                 child: ProfilePicture(
-                  userInfo: userinfo,
+                  userInfo: userinfo!,
                 ),
               ),
               onTap: () {

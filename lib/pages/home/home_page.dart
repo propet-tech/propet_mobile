@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:propet_mobile/core/auth/auth_service.dart';
-import 'package:propet_mobile/core/dependencies.dart';
-import 'package:propet_mobile/models/userinfo.dart';
+import 'package:propet_mobile/core/app_state.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -33,10 +31,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var userInfo = context.watch<AppState>().userinfo;
     return Column(
       children: [
         Text(
-          "${getGreeting()}, ${context.read<UserInfo>().name}",
+          "${getGreeting()}, ${userInfo?.name}",
           style: Theme.of(context).textTheme.titleLarge,
         ),
       ],

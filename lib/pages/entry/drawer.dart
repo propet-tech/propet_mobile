@@ -2,25 +2,22 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:propet_mobile/core/app_state.dart';
 import 'package:propet_mobile/core/components/profile_picture.dart';
-import 'package:propet_mobile/models/userinfo.dart';
+import 'package:propet_mobile/models/userinfo/userinfo.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
   Future<void> logout(BuildContext context) async {
-    await launch('http://192.168.1.124:8080/ui/console/users/me');
-    // await Future.delayed(Duration(seconds: 2));
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   SnackBar(content: Text("aaaaaaaaa"),)
-    // );
+    await context.read<AppState>().logout();
   }
 
   @override
   Widget build(BuildContext context) {
-    final userinfo = context.read<UserInfo>();
+    final userinfo = context.read<AppState>().userinfo!;
     return Drawer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -39,7 +36,9 @@ class AppDrawer extends StatelessWidget {
                 ElevatedButtonSecondaryColor(
                   label: "Configurações",
                   icon: Icons.settings,
-                  onPressed: () {},
+                  onPressed: () {
+                    context.push("/config");
+                  },
                 ),
                 const SizedBox(height: 10),
                 ElevatedLoadButton(
