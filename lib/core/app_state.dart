@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:injectable/injectable.dart';
 import 'package:propet_mobile/core/services/auth_service.dart';
 import 'package:propet_mobile/models/userinfo/userinfo.dart';
@@ -26,9 +27,13 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> autoLogin() async { 
+    try {
     await _auth.autoLogin();
     userinfo = await _user.getUserInfo();
     notifyListeners();
+    } on PlatformException catch (e) {
+      debugPrint("Error on auto login: ${e.message}");
+    }
   }
 
 }

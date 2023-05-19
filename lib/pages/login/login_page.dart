@@ -17,11 +17,11 @@ class _LoginPageState extends State<LoginPage> {
     try {
       setState(() => loading = true);
       await getIt<AppState>().login();
-    } catch (ex) {
-      var error = ex as PlatformException;
+    } on PlatformException catch (ex) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(error.message ?? "Um error inesperado aconteceu!")),
+          content: Text(ex.message ?? "Um error inesperado aconteceu!"),
+        ),
       );
     } finally {
       setState(() => loading = false);

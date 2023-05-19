@@ -10,6 +10,7 @@ void main() async {
 
   await Future.wait([
     configureDependencies(),
+    getIt<AppState>().autoLogin()
   ]);
 
   runApp(const ProPetApp());
