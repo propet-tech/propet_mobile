@@ -1,8 +1,7 @@
 import 'dart:math';
 
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:propet_mobile/models/userinfo.dart';
+import 'package:propet_mobile/models/userinfo/userinfo.dart';
 
 class ProfilePicture extends StatelessWidget {
   final UserInfo userInfo;
@@ -27,9 +26,9 @@ class ProfilePicture extends StatelessWidget {
       builder: (context, limits) {
         if (userInfo.picture != null) {
           return CircleAvatar(
-            backgroundImage: ExtendedNetworkImageProvider(
+            backgroundImage: NetworkImage(
               userInfo.picture!,
-              cache: true,
+              // cache: true,
             ),
             radius: min(limits.maxHeight / 2, limits.maxWidth / 2),
           );

@@ -1,15 +1,15 @@
 import 'package:dio/dio.dart';
-import 'package:propet_mobile/core/auth/auth_service.dart';
+import 'package:propet_mobile/core/services/auth_service.dart';
 
 class AppInterceptors extends Interceptor {
-  final AuthService auth;
+  final AuthService app;
 
-  AppInterceptors({required this.auth});
+  AppInterceptors({required this.app});
 
   @override
-  void onRequest(
-      RequestOptions options, RequestInterceptorHandler handler) async {
-    String? accessToken = await auth.getAccessToken();
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+    String? accessToken = await app.getAccessTokenAndRefresh();
+
     options.headers
         .addEntries([MapEntry("Authorization", "Bearer $accessToken")]);
     super.onRequest(options, handler);

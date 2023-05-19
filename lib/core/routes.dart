@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:propet_mobile/core/auth/auth_service.dart';
-import 'package:propet_mobile/core/entry_point.dart';
-import 'package:propet_mobile/pages/home_page.dart';
-import 'package:propet_mobile/pages/loading_page.dart';
+import 'package:propet_mobile/core/app_state.dart';
+import 'package:propet_mobile/core/dependencies.dart';
+import 'package:propet_mobile/core/services/auth_service.dart';
+import 'package:propet_mobile/pages/config/config_page.dart';
+import 'package:propet_mobile/pages/entry/entry_point.dart';
+import 'package:propet_mobile/pages/home/home_page.dart';
 import 'package:propet_mobile/pages/login/login_page.dart';
 import 'package:propet_mobile/pages/order/track_pet.dart';
 import 'package:propet_mobile/pages/pedido_page.dart';
-import 'package:propet_mobile/pages/pet/pets_page.dart';
-import 'package:propet_mobile/core/dependencies.dart';
-import 'package:propet_mobile/services/user_service.dart';
-import 'package:provider/provider.dart';
+import 'package:propet_mobile/pages/pet/pet_detail.dart';
+import 'package:propet_mobile/pages/pet/pet_list_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final routes = GoRouter(
   initialLocation: "/login",
-  refreshListenable: getIt<AuthService>(),
+  navigatorKey: _rootNavigatorKey,
+  refreshListenable: getIt<AppState>(),
   redirect: (context, state) {
     bool isAuthenticated = getIt<AuthService>().isAuthenticated();
 
@@ -29,7 +30,6 @@ final routes = GoRouter(
 
     return null;
   },
-  navigatorKey: _rootNavigatorKey,
   routes: [
     GoRoute(
       path: "/login",
@@ -37,22 +37,15 @@ final routes = GoRouter(
         return const LoginPage();
       },
     ),
+    GoRoute(
+      path: "/config",
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => const ConfigPage(),
+    ),
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
       builder: (context, state, child) {
-        return FutureBuilder(
-          future: getIt<UserService>().getUserInfo(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ChangeNotifierProvider.value(
-                value: snapshot.data,
-                child: ScaffoldNavBar(child: child),
-              );
-            } else {
-              return const LoadingPage();
-            }
-          },
-        );
+        return ScaffoldNavBar(child: child);
       },
       routes: [
         GoRoute(
@@ -76,13 +69,21 @@ final routes = GoRouter(
           },
         ),
         GoRoute(
-          path: "/pets",
-          pageBuilder: (context, state) {
-            return const NoTransitionPage(
-              child: PetsPage(),
-            );
-          },
-        ),
+            path: "/pets",
+            pageBuilder: (context, state) {
+              return const NoTransitionPage(
+                child: PetListPage(),
+              );
+            },
+            routes: [
+              GoRoute(
+                path: "edit",
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (context, state) {
+                  return PetDetailPage(state: state.extra);
+                },
+              ),
+            ]),
       ],
     )
   ],

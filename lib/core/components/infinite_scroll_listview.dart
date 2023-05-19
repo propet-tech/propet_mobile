@@ -7,11 +7,16 @@ class InfiniteScrollListView<T> extends StatefulWidget {
     T item,
     int index,
   ) itemBuilder;
+  final PagingController<int, T>? pagingController;
 
   final void Function(int pageKey, PagingController pagingController) fetchData;
 
-  const InfiniteScrollListView(
-      {super.key, required this.itemBuilder, required this.fetchData});
+  const InfiniteScrollListView({
+    super.key,
+    required this.itemBuilder,
+    required this.fetchData,
+    this.pagingController,
+  });
 
   @override
   State<InfiniteScrollListView> createState() =>
@@ -23,7 +28,11 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
 
   @override
   void initState() {
-    pagingController = PagingController(firstPageKey: 0);
+    if (widget.pagingController != null) {
+      pagingController = widget.pagingController!;
+    } else {
+      pagingController = PagingController(firstPageKey: 0);
+    }
     pagingController.addPageRequestListener((pageKey) {
       widget.fetchData(pageKey, pagingController);
     });
@@ -40,7 +49,6 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       child: PagedListView.separated(
-        padding: const EdgeInsets.all(5),
         pagingController: pagingController,
         builderDelegate: PagedChildBuilderDelegate<T>(
           itemBuilder: widget.itemBuilder,
