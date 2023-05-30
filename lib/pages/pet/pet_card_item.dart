@@ -11,20 +11,14 @@ class PetCardItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var image = pet.image != null ? DioImage(Uri.parse(pet.image!)) : null;
-    return GestureDetector(
-      child: Card(
-        elevation: 2,
-        child: ListTile(
-          leading: CircleAvatar(
-            radius: 30,
-            foregroundImage: image,
-            child: const Icon(Icons.pets_sharp),
-          ),
-          title: Text(pet.name),
-          subtitle: Text("${pet.weight.toString()} Kg"),
-          trailing: const Icon(Icons.more_vert),
-        ),
+    return ListTile(
+      leading: CircleAvatar(
+        radius: 30,
+        foregroundImage: image,
+        child: const Icon(Icons.pets_sharp),
       ),
+      title: Text(pet.name),
+      subtitle: Text("${pet.breed.name}"),
       onTap: () {
         context.push("/pets/edit", extra: pet);
       },

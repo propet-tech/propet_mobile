@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:propet_mobile/core/app_state.dart';
 import 'package:propet_mobile/core/components/profile_picture.dart';
+import 'package:propet_mobile/core/providers/cart_provider.dart';
 import 'package:propet_mobile/pages/entry/drawer.dart';
 import 'package:provider/provider.dart';
 
@@ -42,8 +43,8 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
     ),
     const ScaffoldWithNavBarTabItem(
       icon: Icon(Icons.shopping_bag),
-      title: "Meus Pedidos",
-      label: "Pedidos",
+      title: "Serviços",
+      label: "Serviços",
       initialLocation: "/orders",
     ),
   ];
@@ -73,9 +74,14 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
           Container(
             margin: const EdgeInsets.only(right: 18),
             alignment: Alignment.center,
-            child: const Badge(
-              label: Text("20"),
-              child: Icon(Icons.shopping_cart),
+            child: GestureDetector(
+              onTap: () => context.push("/orders/cart"),
+              child: Badge(
+                label: Consumer<CartProvider>(
+                  builder: (context, value, child) => Text(value.count.toString()),
+                ),
+                child: Icon(Icons.shopping_cart),
+              ),
             ),
           ),
         ],

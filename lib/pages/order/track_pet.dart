@@ -16,8 +16,8 @@ class PetTrack extends StatefulWidget {
 
 class _PetTrackState extends State<PetTrack> {
   late final StompClient client;
-  final StreamController<PetShopService> stream =
-      StreamController<PetShopService>();
+  final StreamController<PetShopServiceDto> stream =
+      StreamController<PetShopServiceDto>();
   int index = 0;
 
   @override
@@ -30,7 +30,7 @@ class _PetTrackState extends State<PetTrack> {
             destination: "/topic/greetings",
             callback: (p0) {
               print(p0.body);
-              stream.add(PetShopService.fromJson(jsonDecode(p0.body!)["content"]));
+              stream.add(PetShopServiceDto.fromJson(jsonDecode(p0.body!)["content"]));
             },
           );
         },
@@ -52,15 +52,15 @@ class _PetTrackState extends State<PetTrack> {
       stream: stream.stream,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          if (snapshot.data!.status == "RECEBIDO") {
-            index = 0;
-          } else if (snapshot.data!.status == "PROCESSO") {
-            index = 1;
-          } else if (snapshot.data!.status == "ENCAMINHADO") {
-            index = 2;
-          } else if (snapshot.data!.status == "ENTREGE") {
-            index = 3;
-          }
+        //   if (snapshot.data!.status == "RECEBIDO") {
+        //     index = 0;
+        //   } else if (snapshot.data!.status == "PROCESSO") {
+        //     index = 1;
+        //   } else if (snapshot.data!.status == "ENCAMINHADO") {
+        //     index = 2;
+        //   } else if (snapshot.data!.status == "ENTREGE") {
+        //     index = 3;
+        //   }
 
           return Stepper(
             currentStep: index,

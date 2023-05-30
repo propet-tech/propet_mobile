@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:get_it_mixin/get_it_mixin.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:propet_mobile/core/components/bottom_modal.dart';
 import 'package:propet_mobile/core/components/loading_dialog.dart';
@@ -15,9 +17,9 @@ import 'package:propet_mobile/services/breed_service.dart';
 import 'package:propet_mobile/services/pet_service.dart';
 
 class PetDetailPage extends StatefulWidget {
-  final Object? state;
+  final Pet? pet;
 
-  const PetDetailPage({super.key, this.state});
+  const PetDetailPage({super.key, this.pet});
 
   @override
   State<PetDetailPage> createState() => _PetDetailPageState();
@@ -26,88 +28,93 @@ class PetDetailPage extends StatefulWidget {
 class _PetDetailPageState extends State<PetDetailPage> {
   final ImagePicker picker = ImagePicker();
   final _formKey = GlobalKey<FormBuilderState>();
+  final petService = getIt<PetService>();
 
-  Pet? pet;
-  File? image;
+  Future<bool> onSavePressed() async {
+    _formKey.currentState!.save();
+    final result = _formKey.currentState!.value;
+    final request = PetRequest.fromJson(result);
+
+    if (widget.pet == null) {
+      await petService.createPet(request, image);
+    } else {
+      request.id = widget.pet!.id;
+      await petService.updatePet(request, image);
+    }
+    return true;
+  }
+
+  String? image;
 
   Future<void> pickImage(ImageSource source) async {
     XFile? xfile = await picker.pickImage(source: source);
     if (xfile != null) {
       setState(() {
-        image = File(xfile.path);
+        image = xfile.path;
       });
     }
   }
 
-  final sortList = [
-    Teste("Galeria", Icons.image, ImageSource.gallery),
-    Teste("Camera", Icons.camera, ImageSource.camera),
-    Teste("Remover", Icons.remove_circle, null),
-  ];
+  void onTapImage(BuildContext ctx) {
+    ModalBottomSheet.show<ImageSource>(
+      ctx,
+      title: "Imagem do Pet",
+      initialSelect: 0,
+      actions: const [
+        ModalBottomSheetAction(
+          title: "Camera",
+          value: ImageSource.camera,
+        ),
+        ModalBottomSheetAction(
+          title: "Galeria",
+          value: ImageSource.gallery,
+        ),
+        ModalBottomSheetAction(
+          title: "Remover",
+          value: null,
+        )
+      ],
+      onChanged: (value) {
+        if (value != null)
+          pickImage(value);
+        else
+          setState(() => image = null);
+      },
+    );
+  }
 
   @override
   void initState() {
     super.initState();
-    if (widget.state != null) pet = widget.state as Pet;
-  }
-
-  void onTapImage(BuildContext context) {
-    showMultiSelectBottomModal(
-      context,
-      MultiSelectBottomModalOptions(
-        title: "Image do Pet",
-        itemCount: sortList.length,
-        initialSelect: 1,
-        itemBuilder: (context, index, isSelected) {
-          return ModalItem(
-            isSelected: isSelected,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(sortList[index].title),
-                Icon(sortList[index].icon)
-              ],
-            ),
-          );
-        },
-      ),
-    ).then((value) {
-      if (value != null) {
-        var source = sortList[value].source;
-        if (source != null) {
-          pickImage(source);
-        }
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     ImageProvider? provider;
 
-    if (image != null) {
-      provider = FileImage(image!);
-    } else if (pet?.image != null) {
-      provider = DioImage(Uri.parse(pet!.image!));
+    if (image == null) {
+      provider = widget.pet?.image != null
+          ? DioImage(Uri.parse(widget.pet!.image!))
+          : null;
+    } else {
+      provider = FileImage(File.fromUri(Uri.file(image!)));
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(pet?.name ?? "Novo Pet"),
+        title: Text(widget.pet?.name ?? "Novo Pet"),
         actions: [
           IconButton(
-              onPressed: () {
-                _formKey.currentState!.save();
-                var result = _formKey.currentState!.value;
-                var pet = PetRequest.fromJson(result);
-                pet.id = this.pet?.id;
-                var future = Future.wait([
-                  getIt<PetService>().updatePet(pet),
-                  getIt<PetService>().addPetImage(pet.id!, image!.path)
-                ]);
-        LoadingDialog.show(context, future: future, title: Text("Pet Atualizado!"), content: Text("Pet Atualizado com sucesso!") );
-              },
-              icon: const Icon(Icons.save))
+            onPressed: () {
+              LoadingDialog.show(context, future: onSavePressed(),
+                  onSuccess: () {
+                context.pop();
+                context.pop();
+              });
+              // context.pop();
+            },
+            icon: const Icon(Icons.save),
+          )
         ],
       ),
       body: Padding(
@@ -115,12 +122,11 @@ class _PetDetailPageState extends State<PetDetailPage> {
         child: FormBuilder(
           key: _formKey,
           initialValue: {
-            "name": pet?.name ?? "",
-            "weight": pet?.weight.toString(),
-            "description": pet?.description ?? "",
-            "breedId": pet?.breed
+            "name": widget.pet?.name,
+            "weight": widget.pet?.weight.toString(),
+            "description": widget.pet?.description,
+            "breedId": widget.pet?.breed
           },
-          onChanged: () {},
           child: ListView(
             children: [
               GestureDetector(
@@ -144,9 +150,7 @@ class _PetDetailPageState extends State<PetDetailPage> {
                     border: OutlineInputBorder(),
                     labelText: "Nome"),
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
@@ -168,31 +172,7 @@ class _PetDetailPageState extends State<PetDetailPage> {
                   ),
                   Expanded(
                     flex: 3,
-                    child: FormBuilderField<PetBreed>(
-                      valueTransformer: (value) => value?.id,
-                      name: "breedId",
-                      builder: (FormFieldState<PetBreed> field) {
-                        return DropdownSearch<PetBreed>(
-                          asyncItems: (text) {
-                            return getIt<BreedService>()
-                                .getAllBreeds()
-                                .then((value) => value!.content);
-                          },
-                          dropdownDecoratorProps: const DropDownDecoratorProps(
-                            dropdownSearchDecoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: "Raça",
-                            ),
-                          ),
-                          onChanged: (value) {
-                            print(value);
-                            field.didChange(value);
-                          },
-                          itemAsString: (breed) => breed.name,
-                          selectedItem: field.value,
-                        );
-                      },
-                    ),
+                    child: BreedDropdown(name: "breedId"),
                   ),
                 ],
               ),
@@ -208,10 +188,6 @@ class _PetDetailPageState extends State<PetDetailPage> {
                 keyboardType: TextInputType.multiline,
                 maxLines: 5,
               ),
-              // Row(
-              //   crossAxisAlignment: CrossAxisAlignment.stretch,
-              //   children: [
-              // )
             ],
           ),
         ),
@@ -220,55 +196,44 @@ class _PetDetailPageState extends State<PetDetailPage> {
   }
 }
 
-// Positioned(
-//   child: Align(
-//     alignment: Alignment.bottomCenter,
-//     child: Container(
-//       padding: EdgeInsets.all(10),
-//       decoration: BoxDecoration(
-//         color: Theme.of(context).colorScheme.background
-//       ),
-//       child: Row(
-//         children: [
-//           Expanded(
-//             child: ElevatedLoadButton(
-//               icon: Icons.save,
-//               label: "Salvar",
-//               onPressed: () {
-//                 _formKey.currentState!.save();
-//                 // print(_formKey.currentState!.value.toString());
-//                 var result = _formKey.currentState!.value;
-//                 var pet = PetRequest.fromJson(result);
-//                 pet.id = this.pet?.id!;
-//                 return getIt<PetService>().updatePet(pet);
-//               },
-//             ),
-//           ),
-//           SizedBox(width: 10,),
-//           Expanded(
-//             child: ElevatedLoadButton(
-//               icon: Icons.save,
-//               label: "Cancelar",
-//               onPressed: () {
-//                 _formKey.currentState!.save();
-//                 // print(_formKey.currentState!.value.toString());
-//                 var result = _formKey.currentState!.value;
-//                 var pet = PetRequest.fromJson(result);
-//                 pet.id = this.pet?.id!;
-//                 return getIt<PetService>().updatePet(pet);
-//               },
-//             ),
-//           ),
-//         ],
-//       ),
-//     ),
-//   ), //   ],
-// )
+class BreedDropdown extends StatelessWidget with GetItMixin {
+  final String name;
 
-class Teste {
-  String title;
-  IconData icon;
-  ImageSource? source;
+  BreedDropdown({
+    super.key,
+    required this.name,
+  });
 
-  Teste(this.title, this.icon, this.source);
+  @override
+  Widget build(BuildContext context) {
+    return FormBuilderField<PetBreed>(
+      name: name,
+      valueTransformer: (value) => value?.id,
+      builder: (field) {
+        return DropdownSearch<PetBreed>(
+          asyncItems: (_) => get<BreedService>()
+              .getAllBreeds()
+              .then((value) => value!.content),
+          compareFn: (item1, item2) => item1.id == item2.id,
+          popupProps: PopupProps.modalBottomSheet(
+            listViewProps: ListViewProps(),
+            modalBottomSheetProps: ModalBottomSheetProps(
+                useRootNavigator: true,
+                backgroundColor: Theme.of(context).colorScheme.background),
+            title: ModalBottomSheetHeader(title: "Raça"),
+            showSelectedItems: true,
+          ),
+          dropdownDecoratorProps: const DropDownDecoratorProps(
+            dropdownSearchDecoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: "Raça",
+            ),
+          ),
+          onChanged: (value) => field.didChange(value),
+          itemAsString: (breed) => breed.name,
+          selectedItem: field.value,
+        );
+      },
+    );
+  }
 }
