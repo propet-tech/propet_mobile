@@ -1,210 +1,142 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class MultiSelectBottomModalOptions {
-  final String title;
-  final int itemCount;
-  final int initialSelect;
-  final Widget Function(BuildContext context, int index, bool isSelected)
-      itemBuilder;
-
-  const MultiSelectBottomModalOptions({
-    required this.title,
-    required this.initialSelect,
-    required this.itemCount,
-    required this.itemBuilder,
-  });
-}
-
-Future<int?> showMultiSelectBottomModal(
-    BuildContext context, MultiSelectBottomModalOptions options) async {
-  return showModalBottomSheet<int?>(
-    context: context,
-    useRootNavigator: true,
-    builder: (context) {
-      return MultiSelectBottomModal(
-        title: options.title,
-        initialSelect: options.initialSelect,
-        itemCount: options.itemCount,
-        itemBuilder: options.itemBuilder,
-      );
-    },
-  );
-}
-
-class BottomModalHeader extends StatelessWidget {
-  final Widget child;
+class ModalBottomSheetHeader extends StatelessWidget {
   final String title;
 
-  const BottomModalHeader({
+  const ModalBottomSheetHeader({
     super.key,
     required this.title,
-    required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    final screen = MediaQuery.of(context).size;
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: screen.width * 0.5,
-      ),
-      padding: const EdgeInsets.only(top: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Column(
-            children: [
-              Container(
-                height: 8,
-                width: screen.width * 0.3,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSecondary,
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(10),
+    return LayoutBuilder(
+      builder: (ctx, constraints) => Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Column(
+              children: [
+                Container(
+                  height: 8,
+                  width: constraints.maxWidth * 0.3,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(10),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          child,
-        ],
+                const SizedBox(height: 10),
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class MultiSelectBottomModal extends StatelessWidget {
+class ModalBottomSheet<T> extends StatelessWidget {
+  final List<ModalBottomSheetAction<T>> actions;
   final String title;
-
-  final int itemCount;
   final int initialSelect;
-  final Widget Function(
-    BuildContext context,
-    int index,
-    bool isSelected,
-  ) itemBuilder;
+  final Function(T? value) onChanged;
+  final Alignment? alignment;
 
-  const MultiSelectBottomModal({
+  const ModalBottomSheet({
+    super.key,
+    required this.actions,
     required this.title,
-    super.key,
+    required this.onChanged,
     required this.initialSelect,
-    required this.itemCount,
-    required this.itemBuilder,
+    this.alignment,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return BottomModalHeader(
-      title: title,
-      child: MultiSelectBottomModalList(
-        initialSelect: initialSelect,
-        itemBuilder: itemBuilder,
-        itemCount: itemCount,
-      ),
-    );
-  }
-}
-
-class MultiSelectBottomModalList extends StatefulWidget {
-  final int itemCount;
-  final int initialSelect;
-  final Widget Function(
-    BuildContext context,
-    int index,
-    bool isSelected,
-  ) itemBuilder;
-
-  const MultiSelectBottomModalList({
-    super.key,
-    required this.initialSelect,
-    required this.itemCount,
-    required this.itemBuilder,
-  });
-
-  @override
-  State<MultiSelectBottomModalList> createState() => _MultiSelectBottomModalListState();
-}
-
-class _MultiSelectBottomModalListState extends State<MultiSelectBottomModalList> {
-  late int select = 0;
-
-  @override
-  void initState() {
-    select = widget.initialSelect;
-    super.initState();
+  void onTap(BuildContext ctx, int index) {
+    onChanged(actions[index].value);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: widget.itemCount,
-      itemBuilder: (context, index) {
-        bool isSelected = index == select;
-        return GestureDetector(
-          child: widget.itemBuilder(context, index, isSelected),
-          onTap: () {
-            setState(() {
-              select = index;
-              context.pop<int>(index);
-            });
+  static void show<T>(
+    BuildContext ctx, {
+    Key? key,
+    required List<ModalBottomSheetAction<T>> actions,
+    required String title,
+    required Function(T? value) onChanged,
+    required int initialSelect,
+  }) {
+    showModalBottomSheet(
+      context: ctx,
+      builder: (context) {
+        return ModalBottomSheet(
+          actions: actions,
+          title: title,
+          onChanged: (value) {
+            onChanged(value);
+            ctx.pop();
           },
+          initialSelect: initialSelect,
         );
       },
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ModalBottomSheetHeader(
+          title: title,
+        ),
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: actions.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () => onTap(context, index),
+              child: Align(
+                alignment: alignment ?? Alignment.center,
+                child: DefaultTextStyle(
+                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color: index == initialSelect
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onBackground,
+                      ),
+                  child: actions[index],
+                ),
+              ),
+            );
+          },
+        )
+      ],
+    );
+  }
 }
 
-class ModalValue<T> {
-  final Widget child;
-  final T value;
+class ModalBottomSheetAction<T> extends StatelessWidget {
+  final T? value;
+  final String title;
 
-  ModalValue({required this.child, required this.value});
-}
-
-// Separar
-class ModalItem extends StatelessWidget {
-  final bool isSelected;
-  final Widget child;
-  final Alignment? alignment;
-
-  const ModalItem({
+  const ModalBottomSheetAction({
     super.key,
-    required this.isSelected,
-    required this.child,
-    this.alignment
+    required this.value,
+    required this.title,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      alignment: alignment,
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: isSelected
-            ? Theme.of(context).colorScheme.tertiary
-            : Theme.of(context).dialogTheme.backgroundColor,
-      ),
-      child: DefaultTextStyle(
-        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-              color: isSelected
-                  ? Theme.of(context).colorScheme.background
-                  : Theme.of(context).colorScheme.onBackground,
-            ),
-        child: child,
-      ),
+      child: Text(title),
     );
   }
 }
-
-// class ModalItem extends ModalItem2 {
-//   factory ModalItem.icon() = ModalItem2;
-// }

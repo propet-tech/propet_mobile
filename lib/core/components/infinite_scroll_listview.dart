@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:propet_mobile/core/paging_controller.dart';
 
 class InfiniteScrollListView<T> extends StatefulWidget {
-  final Widget Function(
-    BuildContext context,
-    T item,
-    int index,
-  ) itemBuilder;
-  final PagingController<int, T>? pagingController;
+  final Widget Function(BuildContext context, T item, int index) itemBuilder;
+  final Widget Function(BuildContext context, int index) separatorBuilder;
+  final CustomPagingController<int, T>? pagingController;
 
-  final void Function(int pageKey, PagingController pagingController) fetchData;
+  final void Function(int pageKey, CustomPagingController pagingController) fetchData;
 
   const InfiniteScrollListView({
     super.key,
     required this.itemBuilder,
+    required this.separatorBuilder,
     required this.fetchData,
     this.pagingController,
   });
@@ -24,14 +23,14 @@ class InfiniteScrollListView<T> extends StatefulWidget {
 }
 
 class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
-  late final PagingController<int, T> pagingController;
+  late final CustomPagingController<int, T> pagingController;
 
   @override
   void initState() {
     if (widget.pagingController != null) {
       pagingController = widget.pagingController!;
     } else {
-      pagingController = PagingController(firstPageKey: 0);
+      pagingController = CustomPagingController(firstPageKey: 0);
     }
     pagingController.addPageRequestListener((pageKey) {
       widget.fetchData(pageKey, pagingController);
@@ -53,11 +52,7 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
         builderDelegate: PagedChildBuilderDelegate<T>(
           itemBuilder: widget.itemBuilder,
         ),
-        separatorBuilder: (context, index) {
-          return const SizedBox(
-            height: 5,
-          );
-        },
+        separatorBuilder: widget.separatorBuilder
       ),
       onRefresh: () {
         return Future.sync(() => pagingController.refresh());
