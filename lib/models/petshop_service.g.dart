@@ -6,12 +6,18 @@ part of 'petshop_service.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-PetShopService _$PetShopServiceFromJson(Map<String, dynamic> json) =>
-    PetShopService(
-      status: json['status'] as String,
+PetShopServiceDto _$PetShopServiceDtoFromJson(Map<String, dynamic> json) =>
+    PetShopServiceDto(
+      id: json['id'] as int,
+      name: json['name'] as String,
+      value: (json['value'] as num).toDouble(),
+      description: json['description'] as String,
     );
 
-Map<String, dynamic> _$PetShopServiceToJson(PetShopService instance) =>
+Map<String, dynamic> _$PetShopServiceDtoToJson(PetShopServiceDto instance) =>
     <String, dynamic>{
-      'status': instance.status,
+      'id': instance.id,
+      'name': instance.name,
+      'value': instance.value,
+      'description': instance.description,
     };
