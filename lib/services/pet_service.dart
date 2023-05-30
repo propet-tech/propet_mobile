@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:injectable/injectable.dart';
@@ -12,24 +15,57 @@ class PetService {
   PetService(this.http);
 
   Future<PageContent<Pet>> getAllPets(
-      {int? pageIndex, int? pageSize, String? sort}) {
-    return http.get(
-      "/pet",
-      queryParameters: {"page": pageIndex, "size": pageSize, "sort": sort},
-    ).then((value) {
-      return PageContent.fromJson(value.data, (json) => Pet.fromJson(json!));
-    });
-  }
-
-  Future<void> updatePet(PetRequest pet) async {
-    await http.put("/pet", data: pet.toJson());
-  }
-
-  Future<void> addPetImage(int id, String filePath) async {
-    var formData = FormData.fromMap({
-      "file": await MultipartFile.fromFile(filePath, contentType: MediaType("image", "jpeg"))
+      {int? pageIndex, int? pageSize, String? sort}) async {
+    var reponse = await http.get("/pet", queryParameters: {
+      "page": pageIndex,
+      "size": pageSize,
+      "sort": sort,
     });
 
-    await http.post("/pet/$id/image", data: formData);
+    return PageContent.fromJson(reponse.data, (json) => Pet.fromJson(json!));
+  }
+
+  Future<void> createPet(PetRequest pet, [String? imagePath]) async {
+    Map<String, dynamic> form = {
+      "pet": MultipartFile.fromString(
+        jsonEncode(pet.toJson()),
+        contentType: MediaType.parse("application/json"),
+      ),
+    };
+
+    if (imagePath != null) {
+      final imagemf = await MultipartFile.fromFile(
+        imagePath,
+        contentType: MediaType("image", "jpeg"),
+      );
+      form.addEntries([MapEntry("image", imagemf)]);
+    }
+
+    var formData = FormData.fromMap(form);
+    await http.post("/pet", data: formData);
+  }
+
+  Future<void> updatePet(PetRequest pet, [String? imagePath]) async {
+    Map<String, dynamic> form = {
+      "pet": MultipartFile.fromString(
+        jsonEncode(pet.toJson()),
+        contentType: MediaType.parse("application/json"),
+      ),
+    };
+
+    if (imagePath != null) {
+      final imagemf = await MultipartFile.fromFile(
+        imagePath,
+        contentType: MediaType("image", "jpeg"),
+      );
+      form.addEntries([MapEntry("image", imagemf)]);
+    }
+
+    var formData = FormData.fromMap(form);
+    await http.put("/pet", data: formData);
+  }
+
+  Future<void> removePet(int id) async {
+    await http.delete("/pet/$id");
   }
 }
