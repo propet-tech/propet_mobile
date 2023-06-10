@@ -2,9 +2,11 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:go_router/go_router.dart';
 import 'package:propet_mobile/core/app_state.dart';
 import 'package:propet_mobile/core/components/profile_picture.dart';
+import 'package:propet_mobile/environment.dart';
 import 'package:propet_mobile/models/userinfo/userinfo.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +15,10 @@ class AppDrawer extends StatelessWidget {
 
   Future<void> logout(BuildContext context) async {
     await context.read<AppState>().logout();
+  }
+
+  Future<void> openProfile() async {
+    await launch("${AppEnvironment.issuerUrl}/account");
   }
 
   @override
@@ -30,7 +36,7 @@ class AppDrawer extends StatelessWidget {
                 ElevatedButtonSecondaryColor(
                   label: "Meu Perfil",
                   icon: Icons.launch,
-                  onPressed: () {},
+                  onPressed: openProfile,
                 ),
                 const SizedBox(height: 10),
                 ElevatedButtonSecondaryColor(

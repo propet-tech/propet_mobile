@@ -18,7 +18,7 @@ class PetCardItem extends StatelessWidget {
         child: const Icon(Icons.pets_sharp),
       ),
       title: Text(pet.name),
-      subtitle: Text("${pet.breed.name}"),
+      subtitle: Text(pet.breed.name),
       onTap: () {
         context.push("/pets/edit", extra: pet);
       },

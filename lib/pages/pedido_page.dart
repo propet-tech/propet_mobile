@@ -1,9 +1,7 @@
-import 'dart:ui';
-
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:go_router/go_router.dart';
+// import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:propet_mobile/core/components/bottom_modal.dart';
 import 'package:propet_mobile/core/components/infinite_scroll_listview.dart';
@@ -44,166 +42,181 @@ class _PedidosState extends State<Pedidos> {
 
   @override
   Widget build(BuildContext context) {
-    var currecy =
-        NumberFormat.simpleCurrency(decimalDigits: 2, locale: 'pt-BR');
-    final onBackground = Theme.of(context).colorScheme.onBackground;
 
     return Padding(
       padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
       child: InfiniteScrollListView(
         pagingController: controller,
         itemBuilder: (context, item, index) {
-          return Card(
-            child: Container(
-              child: Column(
-                children: [
-                  GridTileBar(
-                    leading: Icon(
-                      Icons.spa,
-                      color: onBackground,
-                    ),
-                    title: Text(
-                      item.name,
-                      style: TextStyle(color: onBackground),
-                    ),
-                    trailing: Text(currecy.format(item.value)),
-                    // backgroundColor: Theme.of(context)
-                    //     .colorScheme
-                    //     .background
-                    //     .withOpacity(0.80),
-                  ),
-                  Container(
-                    height: 180,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage('https://blog.cobasi.com.br/wp-content/uploads/2020/09/banho-tosa.png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  //     footer: Material(
-                  //       color: Theme.of(context)
-                  //           .colorScheme
-                  //           .background
-                  //           .withOpacity(0.80),
-                  GridTileBar(
-                    // backgroundColor: Theme.of(context)
-                    //     .colorScheme
-                    //     .background
-                    //     .withOpacity(0.80),
-                    subtitle: Text(
-                      item.description,
-                      style: TextStyle(color: onBackground),
-                    ),
-                    trailing: IconButton(
-                        onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            useRootNavigator: true,
-                            builder: (_) {
-                              return NewOrderModal(
-                                service: item,
-                              );
-                            },
-                          );
-                          // context.read<CartProvider>().add(1);
-                        },
-                        icon: Icon(
-                          Icons.add_card,
-                          color: onBackground,
-                        )),
-                  ),
-                  //     ),
-                  //   ),
-                ],
-              ),
-            ),
-            // borderRadius: BorderRadius.circular(10),
-            // child: SizedBox(
-            //   height: 230,
-            //   child: GridTile(
-            //     child: Container(
-            //       decoration: BoxDecoration(
-            //         image: DecorationImage(
-            //           fit: BoxFit.cover,
-            //           image: NetworkImage(
-            //             "https://blog.cobasi.com.br/wp-content/uploads/2020/09/banho-tosa.png",
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //     header: GridTileBar(
-            //       leading: Icon(
-            //         Icons.spa,
-            //         color: onBackground,
-            //       ),
-            //       title: Text(
-            //         item.name,
-            //         style: TextStyle(color: onBackground),
-            //       ),
-            //       trailing: Text(currecy.format(item.value)),
-            //       backgroundColor: Theme.of(context)
-            //           .colorScheme
-            //           .background
-            //           .withOpacity(0.80),
-            //     ),
-            //     footer: Material(
-            //       color: Theme.of(context)
-            //           .colorScheme
-            //           .background
-            //           .withOpacity(0.80),
-            //       child: GridTileBar(
-            //         subtitle: Text(
-            //           item.description,
-            //           style: TextStyle(color: onBackground),
-            //         ),
-            //         trailing: IconButton(
-            //             onPressed: () {
-            //               showModalBottomSheet(
-            //                 context: context,
-            //                 useRootNavigator: true,
-            //                 builder: (_) {
-            //                   return NewOrderModal(
-            //                     service: item,
-            //                   );
-            //                 },
-            //               );
-            //               // context.read<CartProvider>().add(1);
-            //             },
-            //             icon: Icon(
-            //               Icons.add_card,
-            //               color: onBackground,
-            //             )),
-            //       ),
-            //     ),
-            //   ),
-            // ),
-          );
+          return ServiceItem(item: item);
         },
-        separatorBuilder: (context, index) => SizedBox(
+        separatorBuilder: (context, index) => const SizedBox(
           height: 10,
         ),
         fetchData: fetchData,
       ),
     );
-    //   return Container(
-    //     padding: EdgeInsets.all(10),
-    //     child: Column(
-    //       crossAxisAlignment: CrossAxisAlignment.stretch,
-    //       children: [
-    //         CampoPedido(title: "Historico"),
-    //         CampoPedido(title: "Em Andamento"),
-    //       ],
-    //     ),
-    //   );
   }
 }
 
-class NewOrderModal extends StatelessWidget {
+class ServiceItem extends StatelessWidget {
+  final PetShopServiceDto item;
+
+  const ServiceItem({
+    super.key,
+    required this.item
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final onBackground = Theme.of(context).colorScheme.onBackground;
+    var currecy =
+        NumberFormat.simpleCurrency(decimalDigits: 2, locale: 'pt-BR');
+    return Card(
+      child: Container(
+        child: Column(
+          children: [
+            GridTileBar(
+              leading: Icon(
+                Icons.spa,
+                color: onBackground,
+              ),
+              title: Text(
+                item.name,
+                style: TextStyle(color: onBackground),
+              ),
+              trailing: Text(currecy.format(item.value)),
+              // backgroundColor: Theme.of(context)
+              //     .colorScheme
+              //     .background
+              //     .withOpacity(0.80),
+            ),
+            Container(
+              height: 180,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(
+                      'https://blog.cobasi.com.br/wp-content/uploads/2020/09/banho-tosa.png'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            //     footer: Material(
+            //       color: Theme.of(context)
+            //           .colorScheme
+            //           .background
+            //           .withOpacity(0.80),
+            GridTileBar(
+              // backgroundColor: Theme.of(context)
+              //     .colorScheme
+              //     .background
+              //     .withOpacity(0.80),
+              subtitle: Text(
+                item.description,
+                style: TextStyle(color: onBackground),
+              ),
+              trailing: IconButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      useRootNavigator: true,
+                      isScrollControlled: true,
+                      builder: (_) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: NewOrderModal(
+                            service: item,
+                          ),
+                        );
+                      },
+                    );
+                    // context.read<CartProvider>().add(1);
+                  },
+                  icon: Icon(
+                    Icons.add_card,
+                    color: onBackground,
+                  )),
+            ),
+            //     ),
+            //   ),
+          ],
+        ),
+      ),
+      // borderRadius: BorderRadius.circular(10),
+      // child: SizedBox(
+      //   height: 230,
+      //   child: GridTile(
+      //     child: Container(
+      //       decoration: BoxDecoration(
+      //         image: DecorationImage(
+      //           fit: BoxFit.cover,
+      //           image: NetworkImage(
+      //             "https://blog.cobasi.com.br/wp-content/uploads/2020/09/banho-tosa.png",
+      //           ),
+      //         ),
+      //       ),
+      //     ),
+      //     header: GridTileBar(
+      //       leading: Icon(
+      //         Icons.spa,
+      //         color: onBackground,
+      //       ),
+      //       title: Text(
+      //         item.name,
+      //         style: TextStyle(color: onBackground),
+      //       ),
+      //       trailing: Text(currecy.format(item.value)),
+      //       backgroundColor: Theme.of(context)
+      //           .colorScheme
+      //           .background
+      //           .withOpacity(0.80),
+      //     ),
+      //     footer: Material(
+      //       color: Theme.of(context)
+      //           .colorScheme
+      //           .background
+      //           .withOpacity(0.80),
+      //       child: GridTileBar(
+      //         subtitle: Text(
+      //           item.description,
+      //           style: TextStyle(color: onBackground),
+      //         ),
+      //         trailing: IconButton(
+      //             onPressed: () {
+      //               showModalBottomSheet(
+      //                 context: context,
+      //                 useRootNavigator: true,
+      //                 builder: (_) {
+      //                   return NewOrderModal(
+      //                     service: item,
+      //                   );
+      //                 },
+      //               );
+      //               // context.read<CartProvider>().add(1);
+      //             },
+      //             icon: Icon(
+      //               Icons.add_card,
+      //               color: onBackground,
+      //             )),
+      //       ),
+      //     ),
+      //   ),
+      // ),
+    );
+  }
+}
+
+class NewOrderModal extends StatefulWidget {
   final PetShopServiceDto service;
-  final _formKey = GlobalKey<FormBuilderState>();
 
   NewOrderModal({super.key, required this.service});
+
+  @override
+  State<NewOrderModal> createState() => _NewOrderModalState();
+}
+
+class _NewOrderModalState extends State<NewOrderModal> {
+  final _formKey = GlobalKey<FormBuilderState>();
 
   void addOrder() {}
 
@@ -213,43 +226,49 @@ class NewOrderModal extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ModalBottomSheetHeader(title: service.name),
+        ModalBottomSheetHeader(title: widget.service.name),
         const SizedBox(height: 10),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: FormBuilder(
+            key: _formKey,
             child: Column(
               children: [
-                DropdownSearch<Pet>(
-                  asyncItems: (_) => getIt<PetService>()
-                      .getAllPets()
-                      .then((value) => value.content),
-                  compareFn: (item1, item2) => item1.id == item2.id,
-                  popupProps: PopupProps.modalBottomSheet(
-                    listViewProps: ListViewProps(),
-                    modalBottomSheetProps: ModalBottomSheetProps(
-                        useRootNavigator: true,
-                        backgroundColor:
-                            Theme.of(context).colorScheme.background),
-                    title: ModalBottomSheetHeader(title: "Serviço"),
-                    itemBuilder: (context, item, isSelected) {
-                      return PetCardItem(pet: item);
-                    },
-                    showSelectedItems: true,
-                  ),
-                  dropdownDecoratorProps: const DropDownDecoratorProps(
-                    dropdownSearchDecoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Pet",
-                        icon: Icon(Icons.pets)),
-                  ),
-                  itemAsString: (item) => item.name,
-                  // onChanged: (value) => field.didChange(value),
-                  // selectedItem: field.value,
+                FormBuilderField<Pet>(
+                  name: 'pet',
+                  builder: (field) {
+                    return DropdownSearch<Pet>(
+                      asyncItems: (_) => getIt<PetService>()
+                          .getAllPets()
+                          .then((value) => value.content),
+                      compareFn: (item1, item2) => item1.id == item2.id,
+                      popupProps: PopupProps.modalBottomSheet(
+                        listViewProps: ListViewProps(),
+                        modalBottomSheetProps: ModalBottomSheetProps(
+                            useRootNavigator: true,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.background),
+                        title: ModalBottomSheetHeader(title: "Pet"),
+                        itemBuilder: (context, item, isSelected) {
+                          return PetCardItem(pet: item);
+                        },
+                        showSelectedItems: true,
+                      ),
+                      dropdownDecoratorProps: const DropDownDecoratorProps(
+                        dropdownSearchDecoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: "Pet",
+                            icon: Icon(Icons.pets)),
+                      ),
+                      itemAsString: (item) => item.name,
+                      onChanged: (value) => field.didChange(value),
+                      selectedItem: field.value,
+                    );
+                  },
                 ),
                 const SizedBox(height: 10),
                 FormBuilderTextField(
-                  name: '',
+                  name: 'notes',
                   keyboardType: TextInputType.multiline,
                   maxLines: 3,
                   decoration: const InputDecoration(
@@ -266,7 +285,7 @@ class NewOrderModal extends StatelessWidget {
                         Icon(Icons.info),
                         const SizedBox(width: 10),
                         Text(
-                          "Total: R\$${service.value}",
+                          "Total: R\$${widget.service.value}",
                           style: Theme.of(context).textTheme.titleSmall,
                         )
                       ],
@@ -278,7 +297,10 @@ class NewOrderModal extends StatelessWidget {
                         backgroundColor: Theme.of(context).colorScheme.primary,
                       ),
                       onPressed: () {
-                        final order = PetShopServiceOrderRequest(1, 2, "aaa");
+                        _formKey.currentState!.save();
+                        var value = _formKey.currentState!.value;
+                        final order = PetShopServiceOrderRequest(
+                            value['pet'], widget.service, value['notes'], null);
                         context.read<CartProvider>().add(order);
                       },
                       label: Text("Adicionar"),

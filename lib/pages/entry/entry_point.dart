@@ -67,6 +67,7 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
   Widget build(BuildContext context) {
     final userinfo = context.read<AppState>().userinfo;
     return Scaffold(
+      // resizeToAvoidBottomInset: false,
       drawer: const AppDrawer(),
       appBar: AppBar(
         scrolledUnderElevation: 0,
@@ -78,9 +79,10 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
               onTap: () => context.push("/orders/cart"),
               child: Badge(
                 label: Consumer<CartProvider>(
-                  builder: (context, value, child) => Text(value.count.toString()),
+                  builder: (context, value, child) =>
+                      Text(value.count.toString()),
                 ),
-                child: Icon(Icons.shopping_cart),
+                child: const Icon(Icons.shopping_cart),
               ),
             ),
           ),
@@ -110,15 +112,7 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
           onTap(value);
         },
       ),
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          return SizedBox(
-            height: constraints.maxHeight,
-            width: constraints.maxWidth,
-            child: widget.child,
-          );
-        },
-      ),
+      body: widget.child,
     );
   }
 }

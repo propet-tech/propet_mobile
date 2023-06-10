@@ -76,6 +76,7 @@ class _PetListPageState extends State<PetListPage> with GetItStateMixin {
 
   @override
   Widget build(BuildContext context) {
+get<PetService>().getAllPets();
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -109,13 +110,7 @@ class _PetListPageState extends State<PetListPage> with GetItStateMixin {
               separatorBuilder: (context, index) {
                 return Padding(
                   padding: const EdgeInsets.only(right: 8, left: 8),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: Divider.createBorderSide(context),
-                      ),
-                    ),
-                  ),
+                  child: DividerWithoutMargin(),
                 );
               },
               itemBuilder: (context, item, index) {
@@ -150,6 +145,23 @@ class _PetListPageState extends State<PetListPage> with GetItStateMixin {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class DividerWithoutMargin extends StatelessWidget {
+  const DividerWithoutMargin({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: Divider.createBorderSide(context),
+        ),
       ),
     );
   }
