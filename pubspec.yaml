@@ -50,6 +50,10 @@ dependencies:
   flutter_slidable: ^3.0.0
   get_it_mixin: ^4.2.0
   intl: ^0.18.1
+  carousel_slider: ^4.2.1
+  dots_indicator: ^3.0.0
+  easy_stepper: ^0.6.0
+  mime: ^1.0.4
 
 dev_dependencies:
   flutter_test:
