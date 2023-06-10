@@ -9,15 +9,17 @@ part of 'service_order.dart';
 PetShopServiceOrderRequest _$PetShopServiceOrderRequestFromJson(
         Map<String, dynamic> json) =>
     PetShopServiceOrderRequest(
-      json['petId'] as int,
-      json['serviceId'] as int,
+      Pet.fromJson(json['pet'] as Map<String, dynamic>),
+      PetShopServiceDto.fromJson(json['service']),
       json['notes'] as String?,
+      json['id'] as int?,
     );
 
 Map<String, dynamic> _$PetShopServiceOrderRequestToJson(
         PetShopServiceOrderRequest instance) =>
     <String, dynamic>{
-      'petId': instance.petId,
-      'serviceId': instance.serviceId,
+      'id': instance.id,
+      'pet': instance.pet,
+      'service': instance.service,
       'notes': instance.notes,
     };

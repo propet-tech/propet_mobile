@@ -6,7 +6,7 @@ part 'pet.g.dart';
 class Pet {
   int id;
   String name;
-  int userId;
+  String user;
   PetBreed breed;
   double weight;
   String? image;
@@ -16,7 +16,7 @@ class Pet {
     this.id,
     this.name,
     this.image,
-    this.userId,
+    this.user,
     this.breed,
     this.weight,
     this.description,
