@@ -10,7 +10,7 @@ abstract class DioConfiguration {
 
   @Singleton()
   Dio dio(AuthService app) {
-    final options = BaseOptions(baseUrl: AppEnvironment.api);
+    final options = BaseOptions(baseUrl: "http://${AppEnvironment.api}");
     final dio = Dio(options);
 
     // Add interceptos

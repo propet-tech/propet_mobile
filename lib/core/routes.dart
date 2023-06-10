@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:propet_mobile/core/app_state.dart';
 import 'package:propet_mobile/core/dependencies.dart';
-import 'package:propet_mobile/core/providers/cart_provider.dart';
 import 'package:propet_mobile/core/services/auth_service.dart';
 import 'package:propet_mobile/models/pet/pet.dart';
 import 'package:propet_mobile/pages/config/config_page.dart';
@@ -15,7 +14,6 @@ import 'package:propet_mobile/pages/order/track_pet.dart';
 import 'package:propet_mobile/pages/pedido_page.dart';
 import 'package:propet_mobile/pages/pet/pet_detail.dart';
 import 'package:propet_mobile/pages/pet/pet_list_page.dart';
-import 'package:provider/provider.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -50,29 +48,27 @@ final routes = GoRouter(
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
       builder: (context, state, child) {
-        return ChangeNotifierProvider(
-          create: (ctx) => CartProvider(),
-          child: ScaffoldNavBar(child: child),
-        );
+        return ScaffoldNavBar(child: child);
       },
       routes: [
         GoRoute(
           path: "/orders",
-          pageBuilder: (context, state) {
-            return NoTransitionPage(child: Pedidos());
+          builder: (context, state) {
+            return Pedidos();
           },
           routes: [
             GoRoute(
               path: "track/:id",
+              parentNavigatorKey: _rootNavigatorKey,
               builder: (context, state) {
                 return PetTrack(id: int.parse(state.pathParameters['id']!));
               },
             ),
             GoRoute(
               path: "cart",
-              // parentNavigatorKey: _rootNavigatorKey,
+              parentNavigatorKey: _rootNavigatorKey,
               builder: (context, state) {
-                return CartList();
+                return CartPage();
               },
             ),
             GoRoute(
@@ -86,16 +82,14 @@ final routes = GoRouter(
         ),
         GoRoute(
           path: "/home",
-          pageBuilder: (context, state) {
-            return const NoTransitionPage(child: HomePage());
+          builder: (context, state) {
+            return  HomePage();
           },
         ),
         GoRoute(
             path: "/pets",
-            pageBuilder: (context, state) {
-              return NoTransitionPage(
-                child: PetListPage(),
-              );
+            builder: (context, state) {
+                return PetListPage();
             },
             routes: [
               GoRoute(

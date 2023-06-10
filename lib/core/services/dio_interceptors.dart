@@ -10,6 +10,7 @@ class AppInterceptors extends Interceptor {
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     String? accessToken = await app.getAccessTokenAndRefresh();
 
+    print(accessToken);
     options.headers
         .addEntries([MapEntry("Authorization", "Bearer $accessToken")]);
     super.onRequest(options, handler);
