@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:injectable/injectable.dart';
+import 'package:propet_mobile/core/util/multipart.dart';
 import 'package:propet_mobile/models/page/page.dart';
 import 'package:propet_mobile/models/pet/pet.dart';
 import 'package:propet_mobile/models/pet/pet_request.dart';
@@ -26,19 +26,11 @@ class PetService {
   }
 
   Future<void> createPet(PetRequest pet, [String? imagePath]) async {
-    Map<String, dynamic> form = {
-      "pet": MultipartFile.fromString(
-        jsonEncode(pet.toJson()),
-        contentType: MediaType.parse("application/json"),
-      ),
-    };
+    Map<String, dynamic> form = _createMap(pet);
 
     if (imagePath != null) {
-      final imagemf = await MultipartFile.fromFile(
-        imagePath,
-        contentType: MediaType("image", "jpeg"),
-      );
-      form.addEntries([MapEntry("image", imagemf)]);
+      var image = await MultiPartUtil.createFileFormField(imagePath, "image");
+      form.addEntries([image]);
     }
 
     var formData = FormData.fromMap(form);
@@ -46,23 +38,24 @@ class PetService {
   }
 
   Future<void> updatePet(PetRequest pet, [String? imagePath]) async {
-    Map<String, dynamic> form = {
+    Map<String, dynamic> form = _createMap(pet);
+
+    if (imagePath != null) {
+      var image = await MultiPartUtil.createFileFormField(imagePath, "image");
+      form.addEntries([image]);
+    }
+
+    var formData = FormData.fromMap(form);
+    await http.put("/pet", data: formData);
+  }
+
+  Map<String, dynamic> _createMap(PetRequest pet) {
+    return {
       "pet": MultipartFile.fromString(
         jsonEncode(pet.toJson()),
         contentType: MediaType.parse("application/json"),
       ),
     };
-
-    if (imagePath != null) {
-      final imagemf = await MultipartFile.fromFile(
-        imagePath,
-        contentType: MediaType("image", "jpeg"),
-      );
-      form.addEntries([MapEntry("image", imagemf)]);
-    }
-
-    var formData = FormData.fromMap(form);
-    await http.put("/pet", data: formData);
   }
 
   Future<void> removePet(int id) async {

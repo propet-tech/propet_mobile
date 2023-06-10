@@ -13,4 +13,10 @@ class PetShopService {
     var response = await http.get("/service");
     return PageContent.fromJson(response.data, (json) => PetShopServiceDto.fromJson(json));
   }
+
+  Future<List<PetShopServiceDto>> getTopService() async {
+    var response = await http.get("/service/top");
+    List<dynamic> list = response.data;
+    return list.map((e) => PetShopServiceDto.fromJson(e['service'])).toList();
+  }
 }

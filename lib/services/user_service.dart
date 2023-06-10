@@ -9,7 +9,7 @@ class UserService {
   // Url exclusiva do keycloak, uma forma mais inteligencia seria usar o endpoint
   //'.well-known/openid-configuration' para descobrir a url do endpoint
   final String oidcUserInfoUrl =
-      "${AppEnvironment.issuerUrl}/oidc/v1/userinfo";
+      "${AppEnvironment.issuerUrl}/protocol/openid-connect/userinfo";
 
   UserService(this.http);
 
