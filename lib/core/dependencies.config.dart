@@ -14,9 +14,10 @@ import 'package:get_it/get_it.dart' as _i1;
 import 'package:injectable/injectable.dart' as _i2;
 import 'package:propet_mobile/core/app_state.dart' as _i10;
 import 'package:propet_mobile/core/services/auth_service.dart' as _i4;
-import 'package:propet_mobile/core/services/dio_http.dart' as _i12;
+import 'package:propet_mobile/core/services/dio_http.dart' as _i13;
 import 'package:propet_mobile/core/services/secure_storage_service.dart' as _i3;
-import 'package:propet_mobile/services/breed_service.dart' as _i11;
+import 'package:propet_mobile/services/banner_service.dart' as _i11;
+import 'package:propet_mobile/services/breed_service.dart' as _i12;
 import 'package:propet_mobile/services/order_service.dart' as _i6;
 import 'package:propet_mobile/services/pet_service.dart' as _i7;
 import 'package:propet_mobile/services/petshop_service.dart' as _i8;
@@ -46,9 +47,10 @@ extension GetItInjectableX on _i1.GetIt {
       gh<_i4.AuthService>(),
       gh<_i9.UserService>(),
     ));
-    gh.factory<_i11.BreedService>(() => _i11.BreedService(gh<_i5.Dio>()));
+    gh.factory<_i11.BannerService>(() => _i11.BannerService(gh<_i5.Dio>()));
+    gh.factory<_i12.BreedService>(() => _i12.BreedService(gh<_i5.Dio>()));
     return this;
   }
 }
 
-class _$DioConfiguration extends _i12.DioConfiguration {}
+class _$DioConfiguration extends _i13.DioConfiguration {}
