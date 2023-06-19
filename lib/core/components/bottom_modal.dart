@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class ModalBottomSheetHeader extends StatelessWidget {
   final String title;
@@ -45,43 +44,31 @@ class ModalBottomSheetHeader extends StatelessWidget {
 }
 
 class ModalBottomSheet<T> extends StatelessWidget {
-  final List<ModalBottomSheetAction<T>> actions;
+  final List<ModalBottomSheetAction> actions;
   final String title;
   final int initialSelect;
-  final Function(T? value) onChanged;
-  final Alignment? alignment;
 
   const ModalBottomSheet({
     super.key,
     required this.actions,
     required this.title,
-    required this.onChanged,
     required this.initialSelect,
-    this.alignment,
   });
-
-  void onTap(BuildContext ctx, int index) {
-    onChanged(actions[index].value);
-  }
 
   static void show<T>(
     BuildContext ctx, {
     Key? key,
-    required List<ModalBottomSheetAction<T>> actions,
+    required List<ModalBottomSheetAction> actions,
     required String title,
-    required Function(T? value) onChanged,
     required int initialSelect,
   }) {
     showModalBottomSheet(
       context: ctx,
+      useRootNavigator: true,
       builder: (context) {
         return ModalBottomSheet(
           actions: actions,
           title: title,
-          onChanged: (value) {
-            onChanged(value);
-            ctx.pop();
-          },
           initialSelect: initialSelect,
         );
       },
@@ -101,19 +88,13 @@ class ModalBottomSheet<T> extends StatelessWidget {
           shrinkWrap: true,
           itemCount: actions.length,
           itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () => onTap(context, index),
-              child: Align(
-                alignment: alignment ?? Alignment.center,
-                child: DefaultTextStyle(
-                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        color: index == initialSelect
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.onBackground,
-                      ),
-                  child: actions[index],
-                ),
-              ),
+            return DefaultTextStyle(
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: index == initialSelect
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onBackground,
+                  ),
+              child: actions[index],
             );
           },
         )
@@ -122,21 +103,24 @@ class ModalBottomSheet<T> extends StatelessWidget {
   }
 }
 
-class ModalBottomSheetAction<T> extends StatelessWidget {
-  final T? value;
+class ModalBottomSheetAction extends StatelessWidget {
   final String title;
+  final Function(BuildContext ctx) onChanged;
 
   const ModalBottomSheetAction({
     super.key,
-    required this.value,
+    required this.onChanged,
     required this.title,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      child: Text(title),
+    return InkWell(
+      onTap: () => onChanged(context),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        child: Text(title, textAlign: TextAlign.center,),
+      ),
     );
   }
 }

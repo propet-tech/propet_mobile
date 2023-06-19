@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class LoadingDialog<T> extends StatelessWidget {
+class LoadingDialog extends StatelessWidget {
   final Widget? title;
   final Widget? content;
   final Widget? errorTitle;
-  final Future<T> future;
-  final void Function(T? data)? onSuccess;
+  final Future<void> future;
+  final void Function()? onSuccess;
 
   const LoadingDialog({
     super.key,
@@ -17,12 +17,12 @@ class LoadingDialog<T> extends StatelessWidget {
     this.onSuccess,
   });
 
-  static show<T>(
+  static show(
     BuildContext ctx, {
     Widget? title,
     Widget? content,
-    required Future<T> future,
-    void Function(T? data)? onSuccess,
+    required Future<bool> future,
+    void Function()? onSuccess,
   }) {
     showDialog(
       barrierDismissible: false,
@@ -66,8 +66,9 @@ class LoadingDialog<T> extends StatelessWidget {
             actions: [
               ElevatedButton(
                 onPressed: () {
+                  context.pop();
                   if (onSuccess != null) {
-                    onSuccess!(snapshot.data);
+                    onSuccess!();
                   }
                 },
                 child: const Text("OK"),
