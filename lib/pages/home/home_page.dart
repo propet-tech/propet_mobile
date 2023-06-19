@@ -2,11 +2,17 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:infinite_scroll_pagination/src/ui/default_indicators/first_page_error_indicator.dart';
+import 'package:intl/intl.dart';
 import 'package:propet_mobile/core/app_state.dart';
+import 'package:propet_mobile/core/components/divider.dart';
 import 'package:propet_mobile/core/dependencies.dart';
+import 'package:propet_mobile/core/dio_image_provider.dart';
+import 'package:propet_mobile/models/banner/banner.dart';
+import 'package:propet_mobile/pages/pet/pet_list_page.dart';
+import 'package:propet_mobile/services/banner_service.dart';
 import 'package:propet_mobile/services/petshop_service.dart';
 import 'package:provider/provider.dart';
-import 'package:infinite_scroll_pagination/src/ui/default_indicators/first_page_error_indicator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,6 +22,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final curreny = NumberFormat.simpleCurrency();
   List<String> images = [
     "https://images5.alphacoders.com/131/1316260.jpg",
     "https://images8.alphacoders.com/131/1314194.jpg",
@@ -25,130 +32,142 @@ class _HomePageState extends State<HomePage> {
   var _currentBanner = 0;
   final CarouselController _controller = CarouselController();
 
-  String getGreeting() {
-    var hours = DateTime.now().hour;
-
-    if (hours >= 6 && hours <= 12) {
-      return "Bom dia";
-    } else if (hours > 12 && hours < 18) {
-      return "Boa Tarde";
-    } else if (hours >= 18 && hours <= 23) {
-      return "Boa Noite";
-    } else {
-      return "Boa Madrugada";
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    var userInfo = context.watch<AppState>().userinfo;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 10),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                "${getGreeting()}, ${userInfo?.name}!",
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
+        Column(
+          children: [
+            FutureBuilder(
+              future: getIt<BannerService>().listAllBanners(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  print(snapshot.error);
+                }
+                if (snapshot.hasData) {
+                  return BannerCarousel(banners: snapshot.data!);
+                }
+
+                return CircularProgressIndicator();
+              },
             ),
-          ),
+            SizedBox(
+              height: 2,
+            ),
+          ],
         ),
-        const SizedBox(height: 10),
-        Card(
+        Expanded(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              CarouselSlider(
-                carouselController: _controller,
-                items: images.map<Widget>((e) {
-                  return Builder(
-                    builder: (context) {
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Container(
-                          // width: MediaQuery.of(context).size.width,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: NetworkImage(e),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Text("Top Serviços",
+                    style: Theme.of(context).textTheme.titleMedium),
+              ),
+              Expanded(
+                child: FutureBuilder(
+                  future: getIt<PetShopService>().getTopService(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return ListView.separated(
+                        itemCount: snapshot.data!.length,
+                        separatorBuilder: (context, index) =>
+                            DividerWithoutMargin(),
+                        itemBuilder: (context, index) {
+                          final value = curreny
+                              .format(snapshot.data![index].value);
+                          return InkWell(
+                            child: ListTile(
+                              leading: CircleAvatar(child: Icon(Icons.pets)),
+                              title: Text(snapshot.data![index].name),
+                              subtitle: Text(value),
+                              trailing: Icon(Icons.arrow_right),
                             ),
-                          ),
-                        ),
+                            onTap: () => context.push("/orders/new", extra: snapshot.data![index]),
+                          );
+                        },
                       );
-                    },
-                  );
-                }).toList(),
-                options: CarouselOptions(
-                  height: 220.0,
-                  autoPlay: true,
-                  enlargeCenterPage: true,
-                  initialPage: _currentBanner,
-                  onPageChanged: (position, reason) {
-                    // setState(() => _currentBanner = position);
+                    }
+
+                    if (snapshot.hasError) return FirstPageErrorIndicator();
+
+                    return Center(child: CircularProgressIndicator());
                   },
-                  enableInfiniteScroll: false,
-                ),
-              ),
-              SizedBox(
-                height: 2,
-              ),
-              DotsIndicator(
-                dotsCount: images.length,
-                position: _currentBanner,
-                onTap: (index) => _controller.animateToPage(index),
-                decorator: DotsDecorator(
-                  activeColor: Theme.of(context).colorScheme.primary,
-                  size: const Size.square(8.0),
-                  activeSize: const Size(18.0, 8.0),
-                  activeShape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
                 ),
               ),
             ],
           ),
-        ),
-        Expanded(
-          child: Card(
-            child: Column(
-              children: [
-                Text("Top Serviços", style: Theme.of(context).textTheme.bodyLarge),
-                Expanded(
-                  child: FutureBuilder(
-                    future: getIt<PetShopService>().getTopService(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return ListView.builder(
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index) {
-                            return InkWell(
-                              child: ListTile(
-                                leading: CircleAvatar(child: Icon(Icons.pets)),
-                                title: Text(snapshot.data![index].name),
-                                subtitle: Text(snapshot.data![index].value.toString()),
-                                trailing: Icon(Icons.arrow_right),
-                              ),
-                              onTap: () => context.go("/orders"),
-                            );
-                          },
-                        );
-                      }
+        )
+      ],
+    );
+  }
+}
 
-                      if (snapshot.hasError)
-                        return FirstPageErrorIndicator();
+class BannerCarousel extends StatefulWidget {
+  const BannerCarousel({
+    super.key,
+    required this.banners,
+  });
 
-                      return Center(child: CircularProgressIndicator());
-                    },
+  final List<BannerDto> banners;
+
+  @override
+  State<BannerCarousel> createState() => _BannerCarouselState();
+}
+
+class _BannerCarouselState extends State<BannerCarousel> {
+  // var _currentBanner = 0;
+  final CarouselController _controller = CarouselController();
+  final ValueNotifier<int> _currentBanner = ValueNotifier<int>(0);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        CarouselSlider.builder(
+          carouselController: _controller,
+          itemCount: widget.banners.length,
+          itemBuilder: (context, index, realIndex) {
+            return Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: DioImage(
+                    Uri.parse(widget.banners[index].image),
                   ),
                 ),
-              ],
-            ),
+              ),
+            );
+          },
+          options: CarouselOptions(
+            autoPlay: true,
+            viewportFraction: 1.0,
+            onPageChanged: (position, reason) {
+              _currentBanner.value = position;
+            },
+            enableInfiniteScroll: false,
           ),
-        )
+        ),
+        ValueListenableBuilder(
+        valueListenable: _currentBanner,
+          builder: (context, value, child) {
+            return DotsIndicator(
+              dotsCount: widget.banners.length,
+              position: value,
+              onTap: (index) => _controller.animateToPage(index),
+              decorator: DotsDecorator(
+                activeColor: Theme.of(context).colorScheme.primary,
+                size: const Size.square(8.0),
+                activeSize: const Size(18.0, 8.0),
+                activeShape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+              ),
+            );
+          }
+        ),
       ],
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:propet_mobile/core/app_state.dart';
 import 'package:propet_mobile/core/dependencies.dart';
+import 'package:propet_mobile/core/services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,7 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   void submit() async {
     try {
       setState(() => loading = true);
-      await getIt<AppState>().login();
+      await getIt<AuthService>().login();
     } on PlatformException catch (ex) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

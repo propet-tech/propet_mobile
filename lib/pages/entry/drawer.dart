@@ -6,6 +6,7 @@ import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:go_router/go_router.dart';
 import 'package:propet_mobile/core/app_state.dart';
 import 'package:propet_mobile/core/components/profile_picture.dart';
+import 'package:propet_mobile/core/services/auth_service.dart';
 import 'package:propet_mobile/environment.dart';
 import 'package:propet_mobile/models/userinfo/userinfo.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +15,7 @@ class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
   Future<void> logout(BuildContext context) async {
-    await context.read<AppState>().logout();
+    await context.read<AuthService>().logout();
   }
 
   Future<void> openProfile() async {
@@ -23,7 +24,7 @@ class AppDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userinfo = context.read<AppState>().userinfo!;
+    final userinfo = context.read<AuthService>().userinfo!;
     return Drawer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -68,6 +69,20 @@ class _AppDrawerHeader extends StatelessWidget {
     required this.userinfo,
   });
 
+  String getGreeting() {
+    var hours = DateTime.now().hour;
+
+    if (hours >= 6 && hours <= 12) {
+      return "Bom dia";
+    } else if (hours > 12 && hours < 18) {
+      return "Boa Tarde";
+    } else if (hours >= 18 && hours <= 23) {
+      return "Boa Noite";
+    } else {
+      return "Boa Madrugada";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return DrawerHeader(
@@ -78,7 +93,7 @@ class _AppDrawerHeader extends StatelessWidget {
             child: ProfilePicture(userInfo: userinfo),
           ),
           const SizedBox(height: 8),
-          Text(userinfo.name)
+          Text("${getGreeting()}, ${userinfo.name}")
         ],
       ),
     );

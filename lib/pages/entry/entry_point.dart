@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:propet_mobile/core/app_state.dart';
 import 'package:propet_mobile/core/components/profile_picture.dart';
 import 'package:propet_mobile/core/providers/cart_provider.dart';
+import 'package:propet_mobile/core/services/auth_service.dart';
 import 'package:propet_mobile/pages/entry/drawer.dart';
 import 'package:provider/provider.dart';
 
@@ -18,30 +19,26 @@ class ScaffoldWithNavBarTabItem extends BottomNavigationBarItem {
       : super(icon: icon, label: label);
 }
 
-class ScaffoldNavBar extends StatefulWidget {
-  final Widget child;
+class ScaffoldNavBar extends StatelessWidget {
 
-  const ScaffoldNavBar({super.key, required this.child});
+  final StatefulNavigationShell navigationShell;
 
-  @override
-  State<ScaffoldNavBar> createState() => _ScaffoldNavBarState();
-}
+  const ScaffoldNavBar({super.key, required this.navigationShell});
 
-class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
-  final tabs = [
-    const ScaffoldWithNavBarTabItem(
+  final tabs = const [
+    ScaffoldWithNavBarTabItem(
       icon: Icon(Icons.home),
       label: "Home",
       title: "Home",
       initialLocation: "/home",
     ),
-    const ScaffoldWithNavBarTabItem(
+    ScaffoldWithNavBarTabItem(
       icon: Icon(Icons.pets),
       title: "Meus Pets",
       label: "Pets",
       initialLocation: "/pets",
     ),
-    const ScaffoldWithNavBarTabItem(
+    ScaffoldWithNavBarTabItem(
       icon: Icon(Icons.shopping_bag),
       title: "Serviços",
       label: "Serviços",
@@ -49,23 +46,9 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
     ),
   ];
 
-  int get currentIndex => locationToIndex(GoRouter.of(context).location);
-
-  int locationToIndex(String location) {
-    final index =
-        tabs.indexWhere((t) => location.startsWith(t.initialLocation));
-    return index < 0 ? 0 : index;
-  }
-
-  void onTap(int index) {
-    if (index != currentIndex) {
-      context.go(tabs[index].initialLocation);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final userinfo = context.read<AppState>().userinfo;
+    final userinfo = context.read<AuthService>().userinfo;
     return Scaffold(
       // resizeToAvoidBottomInset: false,
       drawer: const AppDrawer(),
@@ -103,16 +86,16 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
           },
         ),
         centerTitle: true,
-        title: Text(tabs[currentIndex].title),
+        title: Text(tabs[navigationShell.currentIndex].title),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
+        currentIndex: navigationShell.currentIndex,
         items: tabs,
         onTap: (value) {
-          onTap(value);
+          navigationShell.goBranch(value);
         },
       ),
-      body: widget.child,
+      body: navigationShell,
     );
   }
 }

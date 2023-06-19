@@ -73,69 +73,74 @@ class _PetTrackState extends State<PetTrack> {
       mainAxisSize: MainAxisSize.min,
       children: [
         const ModalBottomSheetHeader(title: "Acompanhar"),
-        StreamBuilder(
-          stream: stream.stream,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final data = snapshot.data!;
-              return ListView.separated(
-                shrinkWrap: true,
-                reverse: true,
-                separatorBuilder: (context, index) {
-                  return Row(
-                    children: [
-                      const SizedBox(width: 35),
-                      Container(
-                        height: 32,
-                        width: 2,
-                        color: Colors.grey,
-                      ),
-                    ],
-                  );
-                },
-                itemCount: data.length,
-                itemBuilder: (context, index) {
-                  final element = data[index];
-
-                  var (icon, text) = switch (element.status) {
-                    "RECEIVED" => (Icons.start, "Recebido"),
-                    "WAITING" => (Icons.hourglass_empty, "Espera"),
-                    "PROCESS" => (Icons.cleaning_services, "Em Andamento"),
-                    "ON_THE_WAY" => (Icons.delivery_dining, "A Caminho"),
-                    "DELIVERED" => (Icons.pets, "Entrege"),
-                    "FINISHED" => (Icons.done, "Finalizado"),
-                    _ => (Icons.done, ""),
-                  };
-
-                  return Column(
-                    children: [
-                      ListTile(
-                        title: Text(text),
-                        subtitle: Row(
-                          children: [
-                            const Icon(Icons.schedule),
-                            const SizedBox(width: 4),
-                            Text(DateFormat("HH:mm, EEEE, d MMMM 'de' yyyy")
-                                .format(element.dateTime)),
-                          ],
+        const SizedBox(width: 10),
+        Flexible(
+          child: StreamBuilder(
+            stream: stream.stream,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final data = snapshot.data!;
+                return ListView.separated(
+                  shrinkWrap: true,
+                  reverse: true,
+                  separatorBuilder: (context, index) {
+                    return Row(
+                      children: [
+                        const SizedBox(width: 35),
+                        Container(
+                          height: 32,
+                          width: 2,
+                          color: Colors.grey,
                         ),
-                        leading: CircleAvatar(
-                          child: Icon(icon),
+                      ],
+                    );
+                  },
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    final element = data[index];
+
+                    var (icon, text) = switch (element.status) {
+                      "RECEIVED" => (Icons.start, "Recebido"),
+                      "WAITING" => (Icons.hourglass_empty, "Espera"),
+                      "PROCESS" => (Icons.cleaning_services, "Em Andamento"),
+                      "ON_THE_WAY" => (Icons.delivery_dining, "A Caminho"),
+                      "DELIVERED" => (Icons.pets, "Entrege"),
+                      "FINISHED" => (Icons.done, "Finalizado"),
+                      _ => (Icons.done, ""),
+                    };
+
+                    return Column(
+                      children: [
+                        ListTile(
+                          title: Text(text),
+                          subtitle: Row(
+                            children: [
+                              const Icon(Icons.schedule),
+                              const SizedBox(width: 4),
+                              Text(DateFormat("HH:mm, EEEE, d MMMM 'de' yyyy")
+                                  .format(element.dateTime)),
+                            ],
+                          ),
+                          leading: CircleAvatar(
+                            child: Icon(icon),
+                          ),
                         ),
-                      ),
+                      ],
+                    );
+                  },
+                );
+              } else {
+                return Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row( mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(),
                     ],
-                  );
-                },
-              );
-            } else {
-              return const Padding(
-                padding: EdgeInsets.all(10),
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-          },
+                  ),
+                );
+              }
+            },
+          ),
         ),
       ],
     );
