@@ -7,12 +7,15 @@ class AppInterceptors extends Interceptor {
   AppInterceptors({required this.app});
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
-    String? accessToken = await app.getAccessTokenAndRefresh();
-
-    print(accessToken);
-    options.headers
-        .addEntries([MapEntry("Authorization", "Bearer $accessToken")]);
-    super.onRequest(options, handler);
+  void onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
+    try {
+      String? accessToken = await app.getAccessTokenAndRefresh();
+      options.headers
+          .addEntries([MapEntry("Authorization", "Bearer $accessToken")]);
+      super.onRequest(options, handler);
+    } catch (e) {
+      return handler.reject(DioError(requestOptions: options, error: e));
+    }
   }
 }

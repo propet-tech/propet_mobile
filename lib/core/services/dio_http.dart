@@ -18,10 +18,7 @@ abstract class DioConfiguration {
     dio.interceptors.add(interceptors);
 
     // Image
-    final dioImage = Dio();
-    dioImage.interceptors.add(interceptors);
-    DioImage.defaultDio = dioImage;
-
+    DioImage.defaultDio = dio;
     return dio;
   }
 }
