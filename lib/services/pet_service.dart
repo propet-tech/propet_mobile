@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
@@ -25,24 +26,24 @@ class PetService {
     return PageContent.fromJson(reponse.data, (json) => Pet.fromJson(json!));
   }
 
-  Future<void> createPet(PetRequest pet, [String? imagePath]) async {
+  Future<void> createPet(PetRequest pet, [File? image]) async {
     Map<String, dynamic> form = _createMap(pet);
 
-    if (imagePath != null) {
-      var image = await MultiPartUtil.createFileFormField(imagePath, "image");
-      form.addEntries([image]);
+    if (image != null) {
+      var file = await MultiPartUtil.createFileFormField(image.path, "image");
+      form.addEntries([file]);
     }
 
     var formData = FormData.fromMap(form);
     await http.post("/pet", data: formData);
   }
 
-  Future<void> updatePet(PetRequest pet, [String? imagePath]) async {
+  Future<void> updatePet(PetRequest pet, [File? image]) async {
     Map<String, dynamic> form = _createMap(pet);
 
-    if (imagePath != null) {
-      var image = await MultiPartUtil.createFileFormField(imagePath, "image");
-      form.addEntries([image]);
+    if (image != null) {
+      var file = await MultiPartUtil.createFileFormField(image.path, "image");
+      form.addEntries([file]);
     }
 
     var formData = FormData.fromMap(form);
@@ -61,4 +62,5 @@ class PetService {
   Future<void> removePet(int id) async {
     await http.delete("/pet/$id");
   }
+
 }

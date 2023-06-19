@@ -9,8 +9,13 @@ class PetShopService {
 
   PetShopService(this.http);
   
-  Future<PageContent<PetShopServiceDto>> getAllServices() async {
-    var response = await http.get("/service");
+  Future<PageContent<PetShopServiceDto>> getAllServices({int? pageIndex, int? pageSize, String? sort, String? search}) async {
+    var response = await http.get("/service", queryParameters: {
+      "page": pageIndex,
+      "size": pageSize,
+      "sort": sort,
+      "search": search
+    });
     return PageContent.fromJson(response.data, (json) => PetShopServiceDto.fromJson(json));
   }
 
