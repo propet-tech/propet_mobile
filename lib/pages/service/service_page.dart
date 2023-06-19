@@ -1,6 +1,7 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
 import 'package:propet_mobile/core/components/bottom_modal.dart';
 import 'package:propet_mobile/core/dependencies.dart';
@@ -91,8 +92,17 @@ class _ServicePageState extends State<ServicePage> {
                     children: [
                       FormBuilderField<Pet>(
                         name: 'pet',
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(),
+                        ]),
                         builder: (field) {
                           return DropdownSearch<Pet>(
+                            validator: (_) {
+                              if (field.hasError) {
+                                return field.errorText;
+                              }
+                              return null;
+                            },
                             asyncItems: (_) => getIt<PetService>()
                                 .getAllPets()
                                 .then((value) => value.content),
@@ -155,6 +165,7 @@ class _ServicePageState extends State<ServicePage> {
                             ),
                             onPressed: () {
                               _formKey.currentState!.save();
+                              if (_formKey.currentState!.validate()) return;
                               var value = _formKey.currentState!.value;
                               final order = PetShopServiceOrderRequest(
                                   value['pet'],

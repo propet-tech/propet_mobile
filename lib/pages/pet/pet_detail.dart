@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -31,18 +32,33 @@ class _PetDetailPageState extends State<PetDetailPage> {
   final _formKey = GlobalKey<FormBuilderState>();
   final petService = getIt<PetService>();
 
-  Future<bool> onSavePressed() async {
+  void onSavePressed() {
+    if (_formKey.currentState!.validate()) {
+      return;
+    }
+
     _formKey.currentState!.save();
     final result = _formKey.currentState!.value;
     final request = PetRequest.fromJson(result);
 
+    Future<bool> op;
     if (widget.pet == null) {
-      await petService.createPet(request, image.value);
+      op = petService
+          .createPet(request, image.value)
+          .then((value) => true)
+          .onError((error, stackTrace) => false);
     } else {
       request.id = widget.pet!.id;
-      await petService.updatePet(request, image.value);
+      op = petService
+          .updatePet(request, image.value)
+          .then((value) => true)
+          .onError((error, stackTrace) => false);
     }
-    return true;
+
+    LoadingDialog.show(context, future: op, onSuccess: () {
+      context.pop();
+      context.pop();
+    });
   }
 
   final image = ValueNotifier<File?>(null);
@@ -57,8 +73,7 @@ class _PetDetailPageState extends State<PetDetailPage> {
         AndroidUiSettings(
             backgroundColor: Theme.of(context).colorScheme.background,
             toolbarColor: Theme.of(context).colorScheme.background,
-            statusBarColor: Theme.of(context).colorScheme.background ,
-            
+            statusBarColor: Theme.of(context).colorScheme.background,
             toolbarTitle: 'Cropper',
             toolbarWidgetColor: Colors.white,
             initAspectRatio: CropAspectRatioPreset.original,
@@ -118,14 +133,7 @@ class _PetDetailPageState extends State<PetDetailPage> {
         title: Text(widget.pet?.name ?? "Novo Pet"),
         actions: [
           IconButton(
-            onPressed: () {
-              LoadingDialog.show(context, future: onSavePressed(),
-                  onSuccess: () {
-                context.pop();
-                context.pop();
-              });
-              // context.pop();
-            },
+            onPressed: onSavePressed,
             icon: const Icon(Icons.save),
           )
         ],
@@ -165,6 +173,9 @@ class _PetDetailPageState extends State<PetDetailPage> {
               FormBuilderTextField(
                 name: "name",
                 textInputAction: TextInputAction.next,
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(),
+                ]),
                 decoration: const InputDecoration(
                     icon: Icon(Icons.pets),
                     border: OutlineInputBorder(),
@@ -180,6 +191,9 @@ class _PetDetailPageState extends State<PetDetailPage> {
                       valueTransformer: (value) => double.parse(value!),
                       textInputAction: TextInputAction.next,
                       keyboardType: TextInputType.number,
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(),
+                      ]),
                       decoration: const InputDecoration(
                         icon: SizedBox(width: 24),
                         border: OutlineInputBorder(),
@@ -228,9 +242,18 @@ class BreedDropdown extends StatelessWidget with GetItMixin {
   Widget build(BuildContext context) {
     return FormBuilderField<PetBreed>(
       name: name,
+      validator: FormBuilderValidators.compose([
+        FormBuilderValidators.required(),
+      ]),
       valueTransformer: (value) => value?.id,
       builder: (field) {
         return DropdownSearch<PetBreed>(
+          validator: (_) {
+            if (field.hasError) {
+              return field.errorText;
+            }
+            return null;
+          },
           asyncItems: (_) => get<BreedService>()
               .getAllBreeds()
               .then((value) => value!.content),
