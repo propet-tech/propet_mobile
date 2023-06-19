@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:propet_mobile/core/components/bottom_modal.dart';
 import 'package:propet_mobile/core/components/loading_dialog.dart';
@@ -36,50 +37,66 @@ class _PetDetailPageState extends State<PetDetailPage> {
     final request = PetRequest.fromJson(result);
 
     if (widget.pet == null) {
-      await petService.createPet(request, image);
+      await petService.createPet(request, image.value);
     } else {
       request.id = widget.pet!.id;
-      await petService.updatePet(request, image);
+      await petService.updatePet(request, image.value);
     }
     return true;
   }
 
-  String? image;
+  final image = ValueNotifier<File?>(null);
 
   Future<void> pickImage(ImageSource source) async {
     XFile? xfile = await picker.pickImage(source: source);
-    if (xfile != null) {
-      setState(() {
-        image = xfile.path;
-      });
+
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: xfile!.path,
+      aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+      uiSettings: [
+        AndroidUiSettings(
+            backgroundColor: Theme.of(context).colorScheme.background,
+            toolbarColor: Theme.of(context).colorScheme.background,
+            statusBarColor: Theme.of(context).colorScheme.background ,
+            
+            toolbarTitle: 'Cropper',
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            hideBottomControls: true,
+            lockAspectRatio: true),
+        IOSUiSettings(
+          title: 'Cropper',
+        ),
+        WebUiSettings(
+          context: context,
+        ),
+      ],
+    );
+
+    if (croppedFile != null) {
+      image.value = File(croppedFile.path);
     }
   }
 
-  void onTapImage(BuildContext ctx) {
-    ModalBottomSheet.show<ImageSource>(
+  void _onTapImage(BuildContext ctx) {
+    ModalBottomSheet.show(
       ctx,
       title: "Imagem do Pet",
-      initialSelect: 0,
-      actions: const [
+      initialSelect: 1,
+      actions: [
         ModalBottomSheetAction(
           title: "Camera",
-          value: ImageSource.camera,
+          onChanged: (ctx) => pickImage(ImageSource.camera),
         ),
         ModalBottomSheetAction(
           title: "Galeria",
-          value: ImageSource.gallery,
+          onChanged: (ctx) => pickImage(ImageSource.gallery),
         ),
         ModalBottomSheetAction(
           title: "Remover",
-          value: null,
+          onChanged: (ctx) => image.value = null,
         )
       ],
-      onChanged: (value) {
-        if (value != null)
-          pickImage(value);
-        else
-          setState(() => image = null);
-      },
     );
   }
 
@@ -92,13 +109,9 @@ class _PetDetailPageState extends State<PetDetailPage> {
   Widget build(BuildContext context) {
     ImageProvider? provider;
 
-    if (image == null) {
-      provider = widget.pet?.image != null
-          ? DioImage(Uri.parse(widget.pet!.image!))
-          : null;
-    } else {
-      provider = FileImage(File.fromUri(Uri.file(image!)));
-    }
+    provider = widget.pet?.image != null
+        ? DioImage(Uri.parse(widget.pet!.image!))
+        : null;
 
     return Scaffold(
       appBar: AppBar(
@@ -130,16 +143,23 @@ class _PetDetailPageState extends State<PetDetailPage> {
           child: ListView(
             children: [
               GestureDetector(
-                onTap: () => onTapImage(context),
-                child: CircleAvatar(
-                  radius: 102,
-                  backgroundColor: Theme.of(context).dividerColor,
-                  child: CircleAvatar(
-                    foregroundImage: provider,
-                    radius: 100,
-                    child: const Icon(Icons.pets_sharp),
-                  ),
-                ),
+                onTap: () => _onTapImage(context),
+                child: ValueListenableBuilder(
+                    valueListenable: image,
+                    builder: (context, value, child) {
+                      provider = value != null
+                          ? FileImage(File(value.path))
+                          : provider;
+                      return CircleAvatar(
+                        radius: 102,
+                        backgroundColor: Theme.of(context).dividerColor,
+                        child: CircleAvatar(
+                          foregroundImage: provider,
+                          radius: 100,
+                          child: const Icon(Icons.pets_sharp),
+                        ),
+                      );
+                    }),
               ),
               const SizedBox(height: 10),
               FormBuilderTextField(
