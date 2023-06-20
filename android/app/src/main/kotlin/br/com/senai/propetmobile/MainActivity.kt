@@ -1,4 +1,4 @@
-package com.example.propet_mobile
+package br.com.senai.propetmobile
 
 import io.flutter.embedding.android.FlutterActivity
 

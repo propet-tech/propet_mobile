@@ -1,5 +1,5 @@
 {
-  "API_URL": "http://192.168.1.124:8088/api",
-  "CLIENT_ID": "214253805489946885@propet",
-  "ISSUER_URL": "http://192.168.1.124:8080"
+  "API_URL": "192.168.1.124:8088/api",
+  "CLIENT_ID": "propet-mobile",
+  "ISSUER_URL": "http://192.168.1.124:8080/realms/propet"
 }

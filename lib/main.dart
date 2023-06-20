@@ -39,10 +39,11 @@ class ProPetApp extends StatelessWidget {
         return DismissKeyboard(
           child: MaterialApp.router(
             supportedLocales: const [
-              Locale("pt"),
+              Locale("pt", "BR"),
             ],
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               FormBuilderLocalizationsDelegate(),
             ],

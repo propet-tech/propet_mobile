@@ -11,8 +11,8 @@ import 'package:propet_mobile/models/userinfo/userinfo.dart';
 @Singleton()
 class AuthService extends ChangeNotifier {
   final _appAuth = const FlutterAppAuth();
-  final _redirectUrl = 'com.duendesoftware.demo:/oauthredirect';
-  final _postLogoutRedirectUrl = 'com.duendesoftware.demo:/';
+  final _redirectUrl = 'br.com.senai.propetmobile:/oauthredirect';
+  final _postLogoutRedirectUrl = 'br.com.senai.propetmobile:/';
   final _scopes = <String>['openid', 'profile', 'email', 'offline_access'];
   final _http = Dio();
   final _userInfoUrl =
@@ -45,9 +45,11 @@ class AuthService extends ChangeNotifier {
 
   Future<void> autoLogin() async {
     var token = await storage.readSecureData("token");
-    _token = await _refreshToken(token!);
-    userinfo = await getUserInfo(_token!.accessToken!);
-    notifyListeners();
+    if (token != null) {
+      _token = await _refreshToken(token);
+      userinfo = await getUserInfo(_token!.accessToken!);
+      notifyListeners();
+    }
   }
 
   Future<UserInfo> getUserInfo(String token) async {
@@ -88,22 +90,16 @@ class AuthService extends ChangeNotifier {
 
     if (token.refreshToken != null && isCompleted) {
       future = _refreshToken(_token!.refreshToken!);
-      print("first");
       isCompleted = false;
       _token = await future;
       isCompleted = true;
 
-      print("first return");
       return _token!.accessToken;
     } else {
-      print("bila");
       await future;
 
-      print("bila return");
       return _token!.accessToken;
     }
-
-    return null;
   }
 
   Future<TokenResponse?> _refreshToken(String refreshToken) async {
